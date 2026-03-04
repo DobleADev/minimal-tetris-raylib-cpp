@@ -29,3 +29,15 @@ steps:
     PathtoPublish: 'build-web'
     ArtifactName: 'tetris-web'
     publishLocation: 'Container'
+
+- script: |
+    cd build-web
+    git init
+    git config user.email "devops@azure.com"
+    git config user.name "Azure Pipeline"
+    git add .
+    git commit -m "Deploy Tetris Web - Build $(Build.BuildId)"
+    # Reemplaza con tu usuario y nombre de repo
+    git push --force https://$(GH_TOKEN)@github.com/TuUsuario/NombreRepo.git master:gh-pages
+  displayName: 'Desplegar a GitHub Pages'
+  condition: succeeded()
