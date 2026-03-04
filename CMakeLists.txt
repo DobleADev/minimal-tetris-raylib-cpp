@@ -24,8 +24,8 @@ if (${PLATFORM} MATCHES "Web")
     target_link_options(index PRIVATE 
         -sUSE_GLFW=3 
         -O2
-        -sTOTAL_MEMORY=67108864
-        --shell-file ${raylib_SOURCE_DIR}/src/shell.html
+        -sINITIAL_MEMORY=67108864
+        --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/shell.html
     )
     set_target_properties(index PROPERTIES SUFFIX ".html")
     target_link_libraries(index raylib)

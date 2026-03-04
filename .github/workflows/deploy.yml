@@ -24,11 +24,15 @@ jobs:
         version: 3.1.64
 
     - name: Configure CMake (Web)
-      # Usamos Ninja para coincidir con tu configuración local
       run: |
         mkdir build-web
         cd build-web
-        emcmake cmake .. -DPLATFORM=Web -G Ninja -DCMAKE_BUILD_TYPE=Release
+        emcmake cmake .. \
+          -DPLATFORM=Web \
+          -DCMAKE_BUILD_TYPE=Release \
+          -G Ninja \
+          -DCMAKE_C_COMPILER=emcc \
+          -DCMAKE_CXX_COMPILER=em++
 
     - name: Build Project
       run: |
