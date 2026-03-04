@@ -1,2 +1,0 @@
-/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/emar qc libraylib.a CMakeFiles/raylib.dir/raudio.c.o CMakeFiles/raylib.dir/rcore.c.o CMakeFiles/raylib.dir/rmodels.c.o CMakeFiles/raylib.dir/rshapes.c.o CMakeFiles/raylib.dir/rtext.c.o CMakeFiles/raylib.dir/rtextures.c.o
-/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/emranlib libraylib.a

@@ -11,7 +11,7 @@
 
 
 set(CPACK_BUILD_SOURCE_DIRS "/home/runner/work/minimal-tetris-raylib-cpp/minimal-tetris-raylib-cpp;/home/runner/work/minimal-tetris-raylib-cpp/minimal-tetris-raylib-cpp/build-web")
-set(CPACK_CMAKE_GENERATOR "Unix Makefiles")
+set(CPACK_CMAKE_GENERATOR "Ninja")
 set(CPACK_COMPONENT_UNSPECIFIED_HIDDEN "TRUE")
 set(CPACK_COMPONENT_UNSPECIFIED_REQUIRED "TRUE")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libatomic1, libc6, libglfw3, libglu1-mesa | libglu1, libglx0, libopengl0")
@@ -22,8 +22,8 @@ set(CPACK_DEFAULT_PACKAGE_DESCRIPTION_SUMMARY "RaylibProjectTemplate built using
 set(CPACK_GENERATOR "ZIP;TGZ;DEB;RPM")
 set(CPACK_INNOSETUP_ARCHITECTURE "x86")
 set(CPACK_INSTALL_CMAKE_PROJECTS "/home/runner/work/minimal-tetris-raylib-cpp/minimal-tetris-raylib-cpp/build-web;RaylibProjectTemplate;ALL;/")
-set(CPACK_INSTALL_PREFIX "/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/cache/sysroot")
-set(CPACK_MODULE_PATH "/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/minimal-tetris-raylib-cpp/minimal-tetris-raylib-cpp/build-web/_deps/raylib-src/cmake")
+set(CPACK_INSTALL_PREFIX "/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cache/sysroot")
+set(CPACK_MODULE_PATH "/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cmake/Modules;/home/runner/work/minimal-tetris-raylib-cpp/minimal-tetris-raylib-cpp/build-web/_deps/raylib-src/cmake")
 set(CPACK_NSIS_DISPLAY_NAME "raylib 6.0.0")
 set(CPACK_NSIS_INSTALLER_ICON_CODE "")
 set(CPACK_NSIS_INSTALLER_MUI_ICON_CODE "")
