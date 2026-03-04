@@ -1,0 +1,31 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+# 1. Instalar Emscripten SDK (emsdk)
+- script: |
+    git clone https://github.com/emscripten-core/emsdk.git
+    cd emsdk
+    ./emsdk install latest
+    ./emsdk activate latest
+    echo "##vso[task.prependpath]$(pwd)"
+  displayName: 'Instalar Emscripten'
+
+# 2. Compilar para Web usando CMake y Ninja
+- script: |
+    source ./emsdk/emsdk_env.sh
+    mkdir build-web
+    cd build-web
+    emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release
+    make
+  displayName: 'Build con Emscripten'
+
+# 3. Publicar los artefactos (HTML, JS, WASM)
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: 'build-web'
+    ArtifactName: 'tetris-web'
+    publishLocation: 'Container'
