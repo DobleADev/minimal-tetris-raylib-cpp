@@ -1,10 +1,10 @@
 # ninja log v7
-2	767	1772651564883950305	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rshapes.c.o	fba0e54e633828f
-767	1038	1772651565649113152	CMakeFiles/index.dir/src/main.cpp.o	849013e83c55eb09
-3	2844	1772651564884821353	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rtext.c.o	34794f1c74616f20
-1	3235	1772651564883423856	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rcore.c.o	d97c56fa34c4280c
-6	5632	1772651564886600956	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rtextures.c.o	c94c6984b9f6c965
-2	7553	1772651564883679795	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rmodels.c.o	d2b0b1dfd007d4ad
-1	8032	1772651564881600935	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/raudio.c.o	f4991c2cf8c5af9f
-8032	8143	1772651572912643596	_deps/raylib-build/raylib/libraylib.a	69aa799b72191f34
-8143	9762	1772651573023644086	index.html	95b15c23441c9ed0
+1	800	1772651860064473721	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rshapes.c.o	14418a53b9af840b
+800	1150	1772651860863085773	CMakeFiles/index.dir/src/main.cpp.o	3a4dd2fcc2865767
+1	2567	1772651860064635304	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rtext.c.o	f6101c70327d8fb7
+1	2978	1772651860064096436	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rcore.c.o	41415faf3cf30c8d
+2	4953	1772651860065378615	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rtextures.c.o	a833f4b6fefead00
+1	7394	1772651860064287439	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/rmodels.c.o	22f2924e1195c4f6
+1	7884	1772651860063560079	_deps/raylib-build/raylib/CMakeFiles/raylib.dir/raudio.c.o	2d0f95f3f78fa585
+7884	7984	1772651867946539160	_deps/raylib-build/raylib/libraylib.a	4bfccca24a4eaff7
+7984	9460	1772651868046538881	index.html	2bccb6f29faf3afd

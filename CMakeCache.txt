@@ -28,7 +28,10 @@ CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
 CMAKE_BUILD_TYPE:STRING=Release
 
 //No help, variable specified on the command line.
-CMAKE_CROSSCOMPILING_EMULATOR:UNINITIALIZED=/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/node/22.16.0_64bit/bin/node
+CMAKE_CROSSCOMPILING_EMULATOR:UNINITIALIZED=/home/runner/work/_temp/e866a3d5-172b-46ed-bf46-ef7a0b1baebe/emsdk-main/node/22.16.0_64bit/bin/node
+
+//CXX compiler
+CMAKE_CXX_COMPILER:STRING=/home/runner/work/_temp/e866a3d5-172b-46ed-bf46-ef7a0b1baebe/emsdk-main/upstream/emscripten/em++
 
 //`clang-scan-deps` dependency scanner
 CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS:FILEPATH=CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-NOTFOUND
@@ -47,6 +50,9 @@ CMAKE_CXX_FLAGS_RELEASE:STRING=-O3 -DNDEBUG
 
 //Flags used by the CXX compiler during RELWITHDEBINFO builds.
 CMAKE_CXX_FLAGS_RELWITHDEBINFO:STRING=-O2 -g -DNDEBUG
+
+//C compiler
+CMAKE_C_COMPILER:STRING=/home/runner/work/_temp/e866a3d5-172b-46ed-bf46-ef7a0b1baebe/emsdk-main/upstream/emscripten/emcc
 
 //`clang-scan-deps` dependency scanner
 CMAKE_C_COMPILER_CLANG_SCAN_DEPS:FILEPATH=CMAKE_C_COMPILER_CLANG_SCAN_DEPS-NOTFOUND
@@ -130,7 +136,7 @@ CMAKE_INSTALL_MANDIR:PATH=
 CMAKE_INSTALL_OLDINCLUDEDIR:PATH=/usr/include
 
 //Install path prefix, prepended onto install directories.
-CMAKE_INSTALL_PREFIX:PATH=/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cache/sysroot
+CMAKE_INSTALL_PREFIX:PATH=/home/runner/work/_temp/e866a3d5-172b-46ed-bf46-ef7a0b1baebe/emsdk-main/upstream/emscripten/cache/sysroot
 
 //Run-time variable data (LOCALSTATEDIR/run)
 CMAKE_INSTALL_RUNSTATEDIR:PATH=
@@ -242,7 +248,7 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 CMAKE_TAPI:FILEPATH=CMAKE_TAPI-NOTFOUND
 
 //The CMake toolchain file
-CMAKE_TOOLCHAIN_FILE:FILEPATH=/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+CMAKE_TOOLCHAIN_FILE:FILEPATH=/home/runner/work/_temp/e866a3d5-172b-46ed-bf46-ef7a0b1baebe/emsdk-main/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -371,6 +377,8 @@ CMAKE_COMMAND:INTERNAL=/usr/local/bin/cmake
 CMAKE_CPACK_COMMAND:INTERNAL=/usr/local/bin/cpack
 //Path to ctest program executable.
 CMAKE_CTEST_COMMAND:INTERNAL=/usr/local/bin/ctest
+//ADVANCED property for variable: CMAKE_CXX_COMPILER
+CMAKE_CXX_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS
 CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS
@@ -383,6 +391,8 @@ CMAKE_CXX_FLAGS_MINSIZEREL-ADVANCED:INTERNAL=1
 CMAKE_CXX_FLAGS_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_CXX_FLAGS_RELWITHDEBINFO
 CMAKE_CXX_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CMAKE_C_COMPILER
+CMAKE_C_COMPILER-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_COMPILER_CLANG_SCAN_DEPS
 CMAKE_C_COMPILER_CLANG_SCAN_DEPS-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_C_FLAGS
@@ -544,5 +554,5 @@ PLATFORM-STRINGS:INTERNAL=Desktop;Web;WebRGFW;Android;Raspberry Pi;DRM;SDL;RGFW
 //STRINGS property for variable: USE_EXTERNAL_GLFW
 USE_EXTERNAL_GLFW-STRINGS:INTERNAL=OFF;IF_POSSIBLE;ON
 //CMAKE_INSTALL_PREFIX during last run
-_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/home/runner/work/_temp/45866ce8-b7a6-44dd-902e-5bc8ff32030c/emsdk-main/upstream/emscripten/cache/sysroot
+_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/home/runner/work/_temp/e866a3d5-172b-46ed-bf46-ef7a0b1baebe/emsdk-main/upstream/emscripten/cache/sysroot
 
