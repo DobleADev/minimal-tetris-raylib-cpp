@@ -1,43 +1,39 @@
-trigger:
-- main
+name: Deploy Raylib Project to GitHub Pages
 
-pool:
-  vmImage: 'ubuntu-latest'
+on:
+  push:
+    branches: [ main ] # Cambia a 'master' si es el nombre de tu rama principal
 
-steps:
-# 1. Instalar Emscripten SDK (emsdk)
-- script: |
-    git clone https://github.com/emscripten-core/emsdk.git
-    cd emsdk
-    ./emsdk install latest
-    ./emsdk activate latest
-    echo "##vso[task.prependpath]$(pwd)"
-  displayName: 'Instalar Emscripten'
+permissions:
+  contents: write
 
-# 2. Compilar para Web usando CMake y Ninja
-- script: |
-    source ./emsdk/emsdk_env.sh
-    mkdir build-web
-    cd build-web
-    emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release
-    make
-  displayName: 'Build con Emscripten'
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
-# 3. Publicar los artefactos (HTML, JS, WASM)
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: 'build-web'
-    ArtifactName: 'tetris-web'
-    publishLocation: 'Container'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-- script: |
-    cd build-web
-    git init
-    git config user.email "devops@azure.com"
-    git config user.name "Azure Pipeline"
-    git add .
-    git commit -m "Deploy Tetris Web - Build $(Build.BuildId)"
-    # Reemplaza con tu usuario y nombre de repo
-    git push --force https://github.com/DobleADev/minimal-tetris-raylib-cpp master:gh-pages
-  displayName: 'Desplegar a GitHub Pages'
-  condition: succeeded()
+    - name: Install Emscripten
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: 3.1.64 # Versión recomendada estable
+
+    - name: Configure CMake (Web)
+      # Usamos los mismos flags que tienes en tu tasks.json
+      run: |
+        mkdir build-web
+        cd build-web
+        emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build Project
+      run: |
+        cd build-web
+        make # En GitHub Actions (Linux) usamos make por defecto
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build-web
