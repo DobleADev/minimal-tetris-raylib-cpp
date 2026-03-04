@@ -1,19 +1,59 @@
-CMakeLists.txt.user
+# --- Compilación y Salida (Build) ---
+# Ignoramos la carpeta donde ocurre la compilación (comúnmente 'build' u 'out')
+[Bb]uild/
+[Oo]ut/
+bin/
+lib/
+
+# --- Artefactos de CMake ---
 CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
+CMakeFiles/
+CMakeScripts/
 cmake_install.cmake
 install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
-_deps
+Makefile
+*.cmake
+
+# Ignore user-specific CMake presets
 CMakeUserPresets.json
 
-# CLion
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
-#cmake-build-*
+# --- Archivos de Objetos y Binarios ---
+*.o
+*.obj
+*.so
+*.a
+*.lib
+*.dll
+*.exe
+*.out
+*.app
+
+# --- Dependencias y Paquetes ---
+# Si usas vcpkg o conan localmente
+vcpkg_installed/
+conan/
+.conan/
+
+# --- IDEs y Editores ---
+# Visual Studio
+.vs/
+*.user
+*.sln
+*.vcxproj
+*.filters
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+# (Opcional: puedes ignorar toda la carpeta si prefieres configurar tu propio entorno)
+
+# CLion / JetBrains
+.idea/
+cmake-build-*/
+
+# --- Otros ---
+*.log
+.DS_Store (macOS)
+Thumbs.db (Windows)
