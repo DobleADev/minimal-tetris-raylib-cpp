@@ -39,8 +39,20 @@ jobs:
         cd build-web
         ninja
 
+    - name: Prepare Artifacts
+      # Creamos una carpeta limpia con solo lo necesario para la web
+      run: |
+        mkdir dist
+        cp build-web/index.html dist/
+        cp build-web/index.js dist/
+        cp build-web/index.wasm dist/
+        # Si tienes una carpeta de recursos (sonidos, imágenes), cópiala también:
+        # cp -r resources dist/ || true
+
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build-web
+        publish_dir: ./dist  # Ahora apuntamos a la carpeta limpia
+
+    
