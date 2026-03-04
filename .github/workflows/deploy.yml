@@ -2,7 +2,7 @@ name: Deploy Raylib Project to GitHub Pages
 
 on:
   push:
-    branches: [ main ] # Cambia a 'master' si es el nombre de tu rama principal
+    branches: [ main ] # Verifica si tu rama es 'main' o 'master'
 
 permissions:
   contents: write
@@ -15,22 +15,25 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install Ninja
+      run: sudo apt-get install -y ninja-build
+
     - name: Install Emscripten
       uses: mymindstorm/setup-emsdk@v14
       with:
-        version: 3.1.64 # Versión recomendada estable
+        version: 3.1.64
 
     - name: Configure CMake (Web)
-      # Usamos los mismos flags que tienes en tu tasks.json
+      # Usamos Ninja para coincidir con tu configuración local
       run: |
         mkdir build-web
         cd build-web
-        emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release
+        emcmake cmake .. -DPLATFORM=Web -G Ninja -DCMAKE_BUILD_TYPE=Release
 
     - name: Build Project
       run: |
         cd build-web
-        make # En GitHub Actions (Linux) usamos make por defecto
+        ninja
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
