@@ -1,0 +1,13 @@
+prefix=/home/runner/work/_temp/960bdd45-d5b5-48b6-be28-5d479a81083c/emsdk-main/upstream/emscripten/cache/sysroot
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: raylib
+Description: A simple and easy-to-use library to enjoy videogames programming
+URL: https://github.com/raysan5/raylib
+Version: 6.0.0
+Libs: -L"${libdir}" -lraylib 
+Libs.private: 
+Requires.private: 
+Cflags: -I"${includedir}"
