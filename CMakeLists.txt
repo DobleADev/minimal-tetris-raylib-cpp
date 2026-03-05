@@ -36,6 +36,7 @@ if (${PLATFORM} MATCHES "Web")
         -O2
         -sINITIAL_MEMORY=67108864
         --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/shell.html
+        --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/resources@resources
     )
     set_target_properties(${TARGET_NAME} PROPERTIES SUFFIX ".html")
 else()
