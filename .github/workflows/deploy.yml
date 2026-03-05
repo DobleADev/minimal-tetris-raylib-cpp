@@ -1,16 +1,19 @@
-name: Deploy Raylib Project to GitHub Pages
+name: CI/CD Build & Release
 
 on:
   push:
-    branches: [ main ] # Verifica si tu rama es 'main' o 'master'
+    branches: [ main ]
+    tags: [ 'v*' ] # Se activa al pushear tags como v1.0, v0.5-alpha, etc.
+  pull_request:
+    branches: [ main ]
 
 permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  # --- TRABAJO 1: BUILD WEB (Linux) ---
+  build-web:
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -27,32 +30,93 @@ jobs:
       run: |
         mkdir build-web
         cd build-web
-        emcmake cmake .. \
-          -DPLATFORM=Web \
-          -DCMAKE_BUILD_TYPE=Release \
-          -G Ninja \
-          -DCMAKE_C_COMPILER=emcc \
-          -DCMAKE_CXX_COMPILER=em++
+        emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -G Ninja -DCMAKE_C_COMPILER=emcc -DCMAKE_CXX_COMPILER=em++
 
-    - name: Build Project
+    - name: Build Web
       run: |
         cd build-web
         ninja
 
-    - name: Prepare Artifacts
-      # Creamos una carpeta limpia con solo lo necesario para la web
+    - name: Prepare Web Artifacts
       run: |
         mkdir dist
         cp build-web/index.html dist/
         cp build-web/index.js dist/
         cp build-web/index.wasm dist/
-        # Si tienes una carpeta de recursos (sonidos, imágenes), cópiala también:
-        # cp -r resources dist/ || true
+        # Copiar recursos si existen
+        # cp -r resources dist/ || true 
+
+    - name: Upload Web Artifact (for Release)
+      uses: actions/upload-artifact@v4
+      with:
+        name: web-build
+        path: dist
 
     - name: Deploy to GitHub Pages
+      # Solo despliega si es push a main o un tag
+      if: github.event_name != 'pull_request'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist  # Ahora apuntamos a la carpeta limpia
+        publish_dir: ./dist
 
-    
+  # --- TRABAJO 2: BUILD WINDOWS (Windows Server) ---
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure CMake (Windows)
+      # Windows usa MSVC por defecto, no necesitamos Ninja ni MinGW obligatoriamente aquí
+      run: cmake -S . -B build-desktop -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build Windows
+      run: cmake --build build-desktop --config Release
+
+    - name: Prepare Windows Artifacts
+      shell: powershell
+      run: |
+        mkdir dist-windows
+        # Busca el .exe generado. Ajusta el nombre si tu proyecto no se llama RaylibProjectTemplate
+        copy build-desktop\Release\*.exe dist-windows\
+        # Copiar recursos si es necesario
+        # if (Test-Path resources) { copy -Recurse resources dist-windows\ }
+
+    - name: Upload Windows Artifact (for Release)
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-build
+        path: dist-windows
+
+  # --- TRABAJO 3: CREAR RELEASE (Solo con Tags) ---
+  create-release:
+    needs: [build-web, build-windows]
+    if: startsWith(github.ref, 'refs/tags/') # Solo corre si pusheaste un Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Web Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+          path: web-build
+
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-build
+          path: windows-build
+
+      - name: Zip Artifacts
+        run: |
+          zip -r game-web.zip web-build
+          zip -r game-windows.zip windows-build
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            game-web.zip
+            game-windows.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
