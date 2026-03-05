@@ -47,6 +47,7 @@ jobs:
         cp build-web/index.html dist/
         cp build-web/index.js dist/
         cp build-web/index.wasm dist/
+        cp build-web/index.data dist/ || echo "No index.data found"
       # Copy assets if the folder exists (optional)
       # Upload the web folder as an artifact to be used in the release job
 
