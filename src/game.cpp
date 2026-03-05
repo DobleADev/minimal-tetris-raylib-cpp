@@ -7,11 +7,11 @@ Game::Game()
     gameOver = true;
     // Reset();
     InitAudioDevice();
-    music = LoadMusicStream("../resources/Minimal Tetris A-Type Music.ogg");
+    music = LoadMusicStream("resources/Minimal Tetris A-Type Music.ogg");
     SetMusicVolume(music, 0.75f);
     PlayMusicStream(music);
-    rotateSound = LoadSound("../resources/rotate-block.wav");
-    clearSound = LoadSound("../resources/line-clear.wav");
+    rotateSound = LoadSound("resources/rotate-block.wav");
+    clearSound = LoadSound("resources/line-clear.wav");
     
 }
 

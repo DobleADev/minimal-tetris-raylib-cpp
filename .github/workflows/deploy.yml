@@ -74,13 +74,13 @@ jobs:
     - name: Prepare Windows Artifacts
       shell: powershell
       run: |
-        # Create a staging directory for the release structure
+        # Create a clean staging directory
         mkdir staging-windows
-        # Copy the executable from the build folder
+        # Copy the .exe to the root of staging
         copy build-desktop\Release\*.exe staging-windows\
-        # Copy the resources folder into the staging directory
+        # Copy the resources folder so it sits next to the .exe
         xcopy /E /I resources staging-windows\resources
-        
+
     - name: Upload Windows Artifact
       uses: actions/upload-artifact@v4
       with:
@@ -103,17 +103,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: windows-build
-          path: windows-build
+          path: windows-release-folder
 
-      - name: Prepare and Package Files
+      - name: Package Files
         run: |
           VERSION=${{ github.ref_name }}
-          # Package Web files
-          zip -r "game-web-${VERSION}.zip" web-build
+          cd web-release-folder
+          zip -r "../game-web-${VERSION}.zip" .
+          cd ..
           
-          # Package Windows files (Includes .exe and resources folder)
-          # We rename the folder or zip directly to ensure the version is in the filename
-          zip -r "game-windows-${VERSION}.zip" windows-build
+          cd windows-release-folder
+          zip -r "../game-windows-${VERSION}.zip" .
+          cd ..
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
