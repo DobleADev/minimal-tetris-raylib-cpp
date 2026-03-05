@@ -85,7 +85,7 @@ jobs:
       run: |
         mkdir dist-windows
         copy build-desktop\Release\*.exe dist-windows\
-        Copy-Item -Path resources -Destination dist-windows\resources -Recurse
+        xcopy /E /I resources dist-windows\resources
 
     - name: Upload Windows Artifact (for Release)
       uses: actions/upload-artifact@v4
