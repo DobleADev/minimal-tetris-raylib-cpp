@@ -47,7 +47,7 @@ jobs:
         cp build-web/index.html dist/
         cp build-web/index.js dist/
         cp build-web/index.wasm dist/
-        cp build-web/index.data dist/ || echo "No index.data found"
+        cp build-web/index.data dist/
       # Copy assets if the folder exists (optional)
       # Upload the web folder as an artifact to be used in the release job
 
@@ -85,9 +85,7 @@ jobs:
       run: |
         mkdir dist-windows
         copy build-desktop\Release\*.exe dist-windows\
-      # Locate the generated .exe and prepare it for distribution
-      # Copy assets if the folder exists
-      # Upload the Windows folder as an artifact to be used in the release job
+        Copy-Item -Path resources -Destination dist-windows\resources -Recurse
 
     - name: Upload Windows Artifact (for Release)
       uses: actions/upload-artifact@v4
