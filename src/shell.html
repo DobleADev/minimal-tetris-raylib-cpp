@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raylib Web Game</title>
+    <title>Minimal Tetris by DobleADev</title>
     <style>
         body {
             margin: 0;
             background-color: #0f1115;
-            /* Fondo oscuro minimalista */
+            /* Minimalist dark background */
             color: #e0e0e0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
@@ -35,7 +35,7 @@
             display: block;
         }
 
-        /* Indicador de carga */
+        /* Loading indicator */
         #status {
             position: absolute;
             top: 50%;
@@ -71,7 +71,7 @@
 
 <body>
     <div id="canvas-container">
-        <div id="status">Iniciando...</div>
+        <div id="status">Starting...</div>
         <div class="spinner" id="spinner"></div>
         <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
     </div>
@@ -83,7 +83,7 @@
         var Module = {
             preRun: [],
             postRun: [function () {
-                // Esto se ejecuta cuando el juego ya cargó
+                // This executes when the game has loaded
                 statusElement.style.display = 'none';
                 spinnerElement.style.display = 'none';
             }],
@@ -116,12 +116,12 @@
             totalDependencies: 0,
             monitorRunDependencies: function (left) {
                 this.totalDependencies = Math.max(this.totalDependencies, left);
-                Module.setStatus(left ? 'Preparando... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'Todo listo!');
+                Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All ready!');
             }
         };
-        Module.setStatus('Descargando...');
+        Module.setStatus('Downloading...');
         window.onerror = function () {
-            Module.setStatus('Error en la ejecución. Revisa la consola.');
+            Module.setStatus('Execution error. Check the console.');
             spinnerElement.style.display = 'none';
             Module.setStatus = function (text) {
                 if (text) console.error('[status] ' + text);
