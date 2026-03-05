@@ -5,6 +5,22 @@ Game::Game()
 {
     grid = Grid();
     gameOver = true;
+    // Reset();
+    InitAudioDevice();
+    music = LoadMusicStream("../resources/Minimal Tetris A-Type Music.ogg");
+    SetMusicVolume(music, 0.75f);
+    PlayMusicStream(music);
+    rotateSound = LoadSound("../resources/rotate-block.wav");
+    clearSound = LoadSound("../resources/line-clear.wav");
+    
+}
+
+Game::~Game()
+{
+    UnloadSound(rotateSound);
+    UnloadSound(clearSound);
+    UnloadMusicStream(music);
+    CloseAudioDevice();
 }
 
 Block Game::GetRandomBlock()
@@ -13,7 +29,11 @@ Block Game::GetRandomBlock()
     {
         blocks = GetAllBlocks();
     }
-    int randomIndex = rand() % blocks.size();
+    static std::random_device rd;  
+    static std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, blocks.size() - 1);
+    int randomIndex = dis(gen);
+    // int randomIndex = rand() % blocks.size();
     Block block = blocks[randomIndex];
     blocks.erase(blocks.begin() + randomIndex);
     return block;
@@ -35,22 +55,25 @@ std::vector<Block> Game::GetAllBlocks()
 void Game::HandleInput()
 {
     int keyPressed = GetKeyPressed();
-    if (gameOver && keyPressed != 0)
+    if (gameOver && (keyPressed == KEY_ENTER || keyPressed == KEY_KP_ENTER))
     {
         Reset();
     }
     switch (keyPressed)
     {
     case KEY_LEFT:
+    case KEY_A:
         MoveBlockLeft();
         break;
-    case KEY_RIGHT:
+    case KEY_RIGHT: 
+    case KEY_D:
         MoveBlockRight();
         break;
     // case KEY_DOWN:
     //     MoveBlockDown();
     //     break;
     case KEY_UP:
+    case KEY_W:
         RotateBlock();
         break;
     
@@ -93,7 +116,25 @@ void Game::MoveBlockDown()
 void Game::Draw()
 {
     grid.Draw();
-    currentBlock.Draw();
+    currentBlock.Draw(91, 1);
+
+    Vector2 nextBlockDraw = {464, 260};
+    switch (nextBlock.id)
+    {
+    case 3:
+        nextBlockDraw.x += -15;
+        nextBlockDraw.y += 20;
+        break;
+    
+    case 4:
+        nextBlockDraw.x += -15;
+        nextBlockDraw.y += 0;
+        break;
+    
+    default:
+        break;
+    }
+    nextBlock.Draw(nextBlockDraw.x, nextBlockDraw.y);
 }
 
 bool Game::IsBlockOutside()
@@ -117,6 +158,10 @@ void Game::RotateBlock()
     {
         currentBlock.UndoRotate();
     }
+    else
+    {
+        PlaySound(rotateSound);
+    }
 }
 
 void Game::LockBlock()
@@ -133,7 +178,12 @@ void Game::LockBlock()
         return;
     }
     nextBlock = GetRandomBlock();
-    grid.ClearFullRows();
+    int rowsCleared = grid.ClearFullRows();
+    if (rowsCleared > 0)
+    {
+        PlaySound(clearSound);
+        UpdateScore(rowsCleared, 0);
+    }
 }
 
 bool Game::BlockFits()
@@ -151,9 +201,30 @@ bool Game::BlockFits()
 
 void Game::Reset()
 {
+    score = 0;
     gameOver = false;
     grid.Initialize();
     blocks = GetAllBlocks();
     currentBlock = GetRandomBlock();
     nextBlock = GetRandomBlock();
+}
+
+void Game::UpdateScore(int linesCleared, int moveDownPoints)
+{
+    switch (linesCleared)
+    {
+    case 1:
+        score += 100;
+        break;
+    case 2:
+        score += 300;
+        break;
+    case 3:
+        score += 500;
+        break;
+    default:
+        break;
+    }
+
+    score += moveDownPoints;
 }
