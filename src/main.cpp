@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "game.h"
+#include <math.h>
 
 double lastUpdateTime = 0;
 
@@ -22,18 +23,48 @@ bool EventTriggered(double interval)
 #endif
 
 Game game;
+const char *startLabel = "Press any key to start a new game";
+int startLabelSize = 24;
+float startLabelBlinkRate = 4;
+
+double blockFallSpeedRate = 0.4;
+double blockFallSpeedMultiplier = 5;
 
 void update(void) {
     game.HandleInput();
-    if (EventTriggered(0.16666))
+
+    double currentBlockFallSpeedMultiplier = 1;
+    if (IsKeyDown(KEY_DOWN))
+    {
+        currentBlockFallSpeedMultiplier /= blockFallSpeedMultiplier;
+    }
+
+    if (EventTriggered(blockFallSpeedRate * currentBlockFallSpeedMultiplier))
     {
         game.MoveBlockDown();
     }
     
     BeginDrawing();
+        int screenWidth = GetScreenWidth();
+        int screenHeight = GetScreenHeight();
         ClearBackground(BLACK);
         game.Draw();
-        // DrawFPS(20, 50);        
+        if (game.gameOver)
+        {
+            DrawRectangle(0, 0, screenWidth, screenHeight, Color({ 0, 0, 0, 127 }));
+            
+            int textWidth = MeasureText(startLabel, startLabelSize);
+            
+            unsigned char alpha = static_cast<unsigned char>(round(abs(sin(GetTime() * startLabelBlinkRate)) * 255));
+            Color whiteBlink = { 255, 255, 255, alpha };
+            DrawText(
+                startLabel, 
+                (screenWidth / 2) - (textWidth / 2), 
+                (screenHeight / 2), 
+                24, whiteBlink
+            );
+        }
+        DrawFPS(8, 8);        
     EndDrawing();
 }
 

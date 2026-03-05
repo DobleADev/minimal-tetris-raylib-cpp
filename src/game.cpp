@@ -4,7 +4,7 @@
 Game::Game()
 {
     grid = Grid();
-    Reset();
+    gameOver = true;
 }
 
 Block Game::GetRandomBlock()
@@ -47,9 +47,9 @@ void Game::HandleInput()
     case KEY_RIGHT:
         MoveBlockRight();
         break;
-    case KEY_DOWN:
-        MoveBlockDown();
-        break;
+    // case KEY_DOWN:
+    //     MoveBlockDown();
+    //     break;
     case KEY_UP:
         RotateBlock();
         break;
@@ -113,7 +113,7 @@ bool Game::IsBlockOutside()
 void Game::RotateBlock()
 {
     currentBlock.Rotate();
-    if (IsBlockOutside())
+    if (IsBlockOutside() || BlockFits() == false)
     {
         currentBlock.UndoRotate();
     }
