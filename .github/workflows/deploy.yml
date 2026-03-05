@@ -3,7 +3,7 @@ name: CI/CD Build & Release
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ] # Triggers on push to main or when a version tag (v*) is created
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main ]
 
@@ -15,7 +15,6 @@ jobs:
   build-web:
     runs-on: ubuntu-latest
     steps:
-      
     - name: Checkout code
       uses: actions/checkout@v4
 
@@ -27,20 +26,17 @@ jobs:
       with:
         version: 3.1.64
       
-    # Configure CMake for WebAssembly using Emscripten and Ninja
     - name: Configure CMake (Web)
       run: |
         mkdir build-web
         cd build-web
         emcmake cmake .. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -G Ninja -DCMAKE_C_COMPILER=emcc -DCMAKE_CXX_COMPILER=em++
     
-    # Build the project using Ninja
     - name: Build Web
       run: |
         cd build-web
         ninja
     
-    # Create a clean distribution folder with only the necessary web files
     - name: Prepare Web Artifacts
       run: |
         mkdir dist
@@ -48,50 +44,48 @@ jobs:
         cp build-web/index.js dist/
         cp build-web/index.wasm dist/
         cp build-web/index.data dist/
-      # Copy assets if the folder exists (optional)
-      # Upload the web folder as an artifact to be used in the release job
 
-    - name: Upload Web Artifact (for Release)
+    - name: Upload Web Artifact
       uses: actions/upload-artifact@v4
       with:
         name: web-build
         path: dist
     
     - name: Deploy to GitHub Pages
-      # Only deploy to GitHub Pages if it's a push to main or a tag (not on PRs)
       if: github.event_name != 'pull_request'
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
 
-  # --- TRABAJO 2: BUILD WINDOWS (Windows Server) ---
+  # --- JOB 2: BUILD WINDOWS (Windows Server) ---
   build-windows:
     runs-on: windows-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-      # Windows uses MSVC by default; Ninja or MinGW are not strictly required here
     - name: Configure CMake (Windows)
       run: cmake -S . -B build-desktop -DCMAKE_BUILD_TYPE=Release
       
-      # Build the Windows executable using CMake's native build command
     - name: Build Windows
       run: cmake --build build-desktop --config Release
 
     - name: Prepare Windows Artifacts
       shell: powershell
       run: |
-        mkdir dist-windows
-        copy build-desktop\Release\*.exe dist-windows\
-        xcopy /E /I resources dist-windows\resources
-
-    - name: Upload Windows Artifact (for Release)
+        # Create a staging directory for the release structure
+        mkdir staging-windows
+        # Copy the executable from the build folder
+        copy build-desktop\Release\*.exe staging-windows\
+        # Copy the resources folder into the staging directory
+        xcopy /E /I resources staging-windows\resources
+        
+    - name: Upload Windows Artifact
       uses: actions/upload-artifact@v4
       with:
         name: windows-build
-        path: dist-windows
+        path: staging-windows
 
   # --- JOB 3: CREATE RELEASE (Only on Tags) ---
   create-release:
@@ -111,23 +105,21 @@ jobs:
           name: windows-build
           path: windows-build
 
-      - name: Prepare Files
-      # Get the tag name (e.g., v1.0.0) from the GitHub environment
-      # Compress the web build into a zip file including the version in the name
-      # Rename the Windows executable to include the version string
-      # Assuming the original output name is RaylibProjectTemplate.exe
+      - name: Prepare and Package Files
         run: |
           VERSION=${{ github.ref_name }}
+          # Package Web files
           zip -r "game-web-${VERSION}.zip" web-build
-          cd windows-build
-          mv *.exe "game-windows-${VERSION}.exe"
-          cd ..
+          
+          # Package Windows files (Includes .exe and resources folder)
+          # We rename the folder or zip directly to ensure the version is in the filename
+          zip -r "game-windows-${VERSION}.zip" windows-build
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             game-web-${{ github.ref_name }}.zip
-            windows-build/game-windows-${{ github.ref_name }}.exe
+            game-windows-${{ github.ref_name }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

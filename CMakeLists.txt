@@ -40,6 +40,13 @@ if (${PLATFORM} MATCHES "Web")
     )
     set_target_properties(${TARGET_NAME} PROPERTIES SUFFIX ".html")
 else()
-    # Desktop specific settings (if any)
+    # Desktop specific settings
     target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_DESKTOP)
+
+    # COPIAR RECURSOS AL DIRECTORIO DE SALIDA
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/resources"
+        "$<TARGET_FILE_DIR:${TARGET_NAME}>/resources"
+    )
 endif()
