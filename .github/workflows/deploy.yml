@@ -108,11 +108,11 @@ jobs:
       - name: Package Files
         run: |
           VERSION=${{ github.ref_name }}
-          cd web-release-folder
+          cd build-web
           zip -r "../game-web-${VERSION}.zip" .
           cd ..
           
-          cd windows-release-folder
+          cd build-desktop
           zip -r "../game-windows-${VERSION}.zip" .
           cd ..
 
