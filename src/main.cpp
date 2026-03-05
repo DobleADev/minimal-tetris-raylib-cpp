@@ -1,4 +1,18 @@
 #include "raylib.h"
+#include "game.h"
+
+double lastUpdateTime = 0;
+
+bool EventTriggered(double interval)
+{
+    double currentTime = GetTime();
+    if (currentTime - lastUpdateTime >= interval)
+    {
+        lastUpdateTime = currentTime;
+        return true;
+    }
+    return false;
+}
 
 #if defined(PLATFORM_WEB)
     #include <emscripten/emscripten.h>
@@ -7,26 +21,31 @@
     #define CURRENT_PLATFORM "DESKTOP"
 #endif
 
-void UpdateDrawFrame(void) {
-    
+Game game;
+
+void update(void) {
+    game.HandleInput();
+    if (EventTriggered(0.16666))
+    {
+        game.MoveBlockDown();
+    }
     
     BeginDrawing();
         ClearBackground(BLACK);
-        
-        DrawFPS(20, 50);
-        
+        game.Draw();
+        // DrawFPS(20, 50);        
     EndDrawing();
 }
 
 int main(void) {
-    InitWindow(800, 450, "Minimal Tetris");
+    InitWindow(800, 600, "Minimal Tetris");
 
 #if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
+    emscripten_set_main_loop(update, 0, 1);
 #else
     SetTargetFPS(60);
     while (!WindowShouldClose()) {
-        UpdateDrawFrame();
+        update();
     }
 #endif
 

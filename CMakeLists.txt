@@ -3,7 +3,7 @@ project(MinimalTetris C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# --- Raylib FetchContent ---
+# 1. --- Raylib FetchContent (Keep as is) ---
 include(FetchContent)
 FetchContent_Declare(
     raylib
@@ -12,25 +12,33 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(raylib)
 
-# --- Configuración de Fuentes ---
-set(SOURCES src/main.cpp)
+# 2. --- Centralized Source Management ---
+# Add every .cpp file in your src folder automatically
+file(GLOB_RECURSE ALL_SOURCES "src/*.cpp")
 
-# --- Lógica de Plataforma ---
+# 3. --- Define the Target Name once ---
 if (${PLATFORM} MATCHES "Web")
-    # Para Web, el output DEBE ser index.html para Live Server
-    add_executable(index ${SOURCES})
-    target_compile_definitions(index PRIVATE PLATFORM_WEB)
+    set(TARGET_NAME "index")
+else()
+    set(TARGET_NAME ${PROJECT_NAME})
+endif()
+
+# 4. --- Create the Executable once ---
+add_executable(${TARGET_NAME} ${ALL_SOURCES})
+target_link_libraries(${TARGET_NAME} PRIVATE raylib)
+
+# 5. --- Platform Specific Logic ---
+if (${PLATFORM} MATCHES "Web")
+    target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_WEB)
     
-    target_link_options(index PRIVATE 
+    target_link_options(${TARGET_NAME} PRIVATE 
         -sUSE_GLFW=3 
         -O2
         -sINITIAL_MEMORY=67108864
         --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/shell.html
     )
-    set_target_properties(index PROPERTIES SUFFIX ".html")
-    target_link_libraries(index raylib)
+    set_target_properties(${TARGET_NAME} PROPERTIES SUFFIX ".html")
 else()
-    # Para Desktop
-    add_executable(${PROJECT_NAME} ${SOURCES})
-    target_link_libraries(${PROJECT_NAME} raylib)
+    # Desktop specific settings (if any)
+    target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_DESKTOP)
 endif()
