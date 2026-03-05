@@ -112,7 +112,7 @@ jobs:
           zip -r "../game-web-${VERSION}.zip" .
           cd ..
           
-          cd windows-build
+          cd staging-windows
           zip -r "../game-windows-${VERSION}.zip" .
           cd ..
 
