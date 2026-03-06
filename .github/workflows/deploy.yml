@@ -103,7 +103,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: windows-build
-          path: windows-release-folder
+          path: windows-build
 
       - name: Package Files
         run: |
@@ -112,7 +112,7 @@ jobs:
           zip -r "../game-web-${VERSION}.zip" .
           cd ..
           
-          cd staging-windows
+          cd windows-build
           zip -r "../game-windows-${VERSION}.zip" .
           cd ..
 
