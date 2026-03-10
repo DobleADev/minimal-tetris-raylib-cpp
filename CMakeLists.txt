@@ -21,25 +21,25 @@ else()
 endif()
 
 # 3. Ejecutable principal
-add_executable(${PROJECT_NAME} app/main.cpp app/GameRenderer.cpp app/InputHandler.cpp app/AudioManager.cpp app/Colors.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE tetris_core raylib)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+add_executable(${TARGET_NAME} app/main.cpp app/GameRenderer.cpp app/InputHandler.cpp app/AudioManager.cpp app/Colors.cpp)
+target_link_libraries(${TARGET_NAME} PRIVATE tetris_core raylib)
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # 4. Copiar recursos (igual que antes)
 if (${PLATFORM} MATCHES "Web")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PLATFORM_WEB)
-    target_link_options(${PROJECT_NAME} PRIVATE 
+    target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_WEB)
+    target_link_options(${TARGET_NAME} PRIVATE 
         -sUSE_GLFW=3 -O2 -sINITIAL_MEMORY=67108864
         --shell-file ${CMAKE_CURRENT_SOURCE_DIR}/src/shell.html
         --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/resources@resources
     )
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
+    set_target_properties(${TARGET_NAME} PROPERTIES SUFFIX ".html")
 else()
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PLATFORM_DESKTOP)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_DESKTOP)
+    add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/resources"
-        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/resources"
+        "$<TARGET_FILE_DIR:${TARGET_NAME}>/resources"
     )
 endif()
 
