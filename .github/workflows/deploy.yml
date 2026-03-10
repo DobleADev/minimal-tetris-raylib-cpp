@@ -40,10 +40,12 @@ jobs:
     - name: Prepare Web Artifacts
       run: |
         mkdir dist
-        cp build-web/index.html dist/
-        cp build-web/index.js dist/
-        cp build-web/index.wasm dist/
-        cp build-web/index.data dist/
+        cd build-web
+        ls -la  # Opcional: muestra los archivos generados para depuración
+        cp MinimalTetris.html ../dist/
+        cp MinimalTetris.js ../dist/
+        cp MinimalTetris.wasm ../dist/
+        cp MinimalTetris.data ../dist/
 
     - name: Upload Web Artifact
       uses: actions/upload-artifact@v4
