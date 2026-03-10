@@ -1,6 +1,8 @@
 # --- Compilación y Salida (Build) ---
 # Ignoramos la carpeta donde ocurre la compilación (comúnmente 'build' u 'out')
 [Bb]uild/
+[Bb]uild-web/
+[Bb]uild-desktop/
 [Oo]ut/
 bin/
 lib/
