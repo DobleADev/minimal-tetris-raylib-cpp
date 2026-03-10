@@ -14,6 +14,12 @@ add_library(tetris_core STATIC ${CORE_SOURCES})
 target_include_directories(tetris_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 # NO enlazamos raylib aquí
 
+if (${PLATFORM} MATCHES "Web")
+    set(TARGET_NAME "index")
+else()
+    set(TARGET_NAME ${PROJECT_NAME})
+endif()
+
 # 3. Ejecutable principal
 add_executable(${PROJECT_NAME} app/main.cpp app/GameRenderer.cpp app/InputHandler.cpp app/AudioManager.cpp app/Colors.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE tetris_core raylib)
