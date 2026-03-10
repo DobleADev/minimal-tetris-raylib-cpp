@@ -1,4 +1,4 @@
-#include "colors.h"
+#include "Colors.h"
 #include <vector>
 
 const Color darkGrey = { 26, 31, 40, 255 };
@@ -14,5 +14,16 @@ const Color darkBlue = { 44, 44, 127, 255 };
 
 std::vector<Color> GetCellColors()
 {
-    return { darkGrey, green, red, orange, yellow, purple, cyan, blue };
+    return { 
+        darkGrey, 
+        green, 
+        red, 
+        orange, 
+        yellow, 
+        purple, 
+        cyan, 
+        blue, 
+        lightBlue, 
+        darkBlue
+    };
 }

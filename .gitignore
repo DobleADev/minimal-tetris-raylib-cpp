@@ -57,3 +57,4 @@ cmake-build-*/
 *.log
 .DS_Store (macOS)
 Thumbs.db (Windows)
+.cache

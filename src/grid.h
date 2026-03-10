@@ -1,26 +1,23 @@
+// Grid.h
 #pragma once
 #include <vector>
-#include <raylib.h>
 
-class Grid
-{
-    public:
-        Grid();
-        void Initialize();
-        void Print();
-        void Draw();
-        bool IsCellOutside(int row, int column);
-        bool IsCellEmpty(int row, int column);
-        int ClearFullRows();
-        int grid[20][10];
-
-    private:
-        bool IsRowFull(int row);
-        void ClearRow(int row);
-        void MoveRowDown(int row, int numRows);
-        int numRows;
-        int numCols;
-        int cellSize;
-        std::vector<Color> colors;
-
+class Grid {
+public:
+    Grid();
+    void Initialize();
+    bool IsCellOutside(int row, int col) const;
+    bool IsCellEmpty(int row, int col) const;
+    int GetCell(int row, int col) const;
+    void SetCell(int row, int col, int value);
+    int ClearFullRows();
+    int GetNumRows() const { return numRows; }
+    int GetNumCols() const { return numCols; }
+private:
+    bool IsRowFull(int row) const;
+    void ClearRow(int row);
+    void MoveRowDown(int row, int numRows);
+    static const int numRows = 20;
+    static const int numCols = 10;
+    int grid[numRows][numCols];
 };
