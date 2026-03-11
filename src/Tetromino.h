@@ -12,9 +12,12 @@ public:
     const std::vector<Position>& GetCells(int rotation) const;
     int GetNumRotations() const;
     void SetPosition(int row, int col);
+    void SetCenter(float x, float y);
     void Move(int dRow, int dCol);
     int GetRow() const;
     int GetCol() const;
+    float GetXCenter() const;
+    float GetYCenter() const;
     int GetRotation() const { return rotation; }
     void Rotate() { rotation = (rotation + 1) % cells.size(); }
     void UndoRotate() { rotation = (rotation + cells.size() - 1) % cells.size(); }
@@ -26,4 +29,6 @@ private:
     int rowOffset;
     int colOffset;
     int rotation; // rotación actual
+    float xCenter;
+    float yCenter;
 };

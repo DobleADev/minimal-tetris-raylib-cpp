@@ -14,6 +14,7 @@ std::vector<Tetromino> GetAllTetrominos() {
         rotations[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,0)};
         rotations[3] = {Position(0,0), Position(0,1), Position(1,1), Position(2,1)};
         Tetromino L(1, rotations);
+        L.SetCenter(1.5, 1.5);
         L.SetPosition(0, 3);
         result.push_back(L);
     }
@@ -26,6 +27,7 @@ std::vector<Tetromino> GetAllTetrominos() {
         rotations[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,2)};
         rotations[3] = {Position(0,1), Position(1,1), Position(2,0), Position(2,1)};
         Tetromino J(2, rotations);
+        J.SetCenter(1.5, 1.5);
         J.SetPosition(0, 3);
         result.push_back(J);
     }
@@ -38,6 +40,7 @@ std::vector<Tetromino> GetAllTetrominos() {
         rotations[2] = {Position(2,0), Position(2,1), Position(2,2), Position(2,3)};
         rotations[3] = {Position(0,1), Position(1,1), Position(2,1), Position(3,1)};
         Tetromino I(3, rotations);
+        I.SetCenter(2, 2);
         I.SetPosition(-1, 3); // Ajuste de I: fila -1, columna 3
         result.push_back(I);
     }
@@ -51,6 +54,7 @@ std::vector<Tetromino> GetAllTetrominos() {
         rotations[2] = cells;
         rotations[3] = cells;
         Tetromino O(4, rotations);
+        O.SetCenter(1, 1);
         O.SetPosition(0, 4); // Ajuste de O: columna 4
         result.push_back(O);
     }
@@ -63,6 +67,7 @@ std::vector<Tetromino> GetAllTetrominos() {
         rotations[2] = {Position(1,1), Position(1,2), Position(2,0), Position(2,1)};
         rotations[3] = {Position(0,0), Position(1,0), Position(1,1), Position(2,1)};
         Tetromino S(5, rotations);
+        S.SetCenter(1.5, 1.5);
         S.SetPosition(0, 3);
         result.push_back(S);
     }
@@ -75,6 +80,7 @@ std::vector<Tetromino> GetAllTetrominos() {
         rotations[2] = {Position(1,0), Position(1,1), Position(1,2), Position(2,1)};
         rotations[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,1)};
         Tetromino T(6, rotations);
+        T.SetCenter(1.5, 1.5);
         T.SetPosition(0, 3);
         result.push_back(T);
     }
@@ -87,6 +93,7 @@ std::vector<Tetromino> GetAllTetrominos() {
         rotations[2] = {Position(1,0), Position(1,1), Position(2,1), Position(2,2)};
         rotations[3] = {Position(0,1), Position(1,0), Position(1,1), Position(2,0)};
         Tetromino Z(7, rotations);
+        Z.SetCenter(1.5, 1.5);
         Z.SetPosition(0, 3);
         result.push_back(Z);
     }

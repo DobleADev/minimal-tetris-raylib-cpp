@@ -3,6 +3,7 @@
 #include "Colors.h" // tus colores definidos
 #include <cstdio>
 #include <cmath>
+#include "Transform2D.h"
 
 GameRenderer::GameRenderer(Font font) : font(font)
 {
@@ -42,6 +43,20 @@ void GameRenderer::DrawPiece(const Tetromino &piece, int offsetX, int offsetY, d
         float x = (c0 + cell.column) * 30 + offsetX;
         float y = (r0 + cell.row + fallProgress) * 30 + offsetY; // interpolación vertical
         DrawRectangle(x, y, 29, 29, colors[piece.GetId()]);
+    }
+}
+
+void GameRenderer::DrawPiece(const Tetromino& piece, const Transform2D& transform, Texture2D blockTex) {
+    auto cells = piece.GetCells(0); // local offsets in cells
+    Vector2 cellSize = {30, 30};
+    for (auto& cell : cells) {
+        // Local position in pixels (relative to piece origin)
+        Vector2 localPos = { (-piece.GetXCenter() + cell.column) * cellSize.x, (-piece.GetYCenter() + cell.row) * cellSize.y };
+        Vector2 worldPos = transform.TransformPoint(localPos);
+        worldPos = Vector2{worldPos.x + (30 * piece.GetXCenter()), worldPos.y + (30 * piece.GetYCenter()) - 15};
+
+        // Draw the block texture (no rotation on the texture itself)
+        DrawTextureEx(blockTex, worldPos, transform.rotation, 1.0f, colors[piece.GetId()]);
     }
 }
 
