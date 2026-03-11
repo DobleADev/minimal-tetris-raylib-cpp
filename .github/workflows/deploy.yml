@@ -109,35 +109,26 @@ jobs:
 
       - name: Install CMake 3.30.3
         run: |
-          # Download the pre-built CMake binary for Linux
           wget https://github.com/Kitware/CMake/releases/download/v3.30.3/cmake-3.30.3-linux-x86_64.tar.gz
           tar -xzf cmake-3.30.3-linux-x86_64.tar.gz
-          # Move it to /opt and create a symlink in /usr/local/bin
           sudo mv cmake-3.30.3-linux-x86_64 /opt/cmake-3.30.3
           sudo ln -sf /opt/cmake-3.30.3/bin/cmake /usr/local/bin/cmake
-          # Verify installation
           cmake --version
 
       - name: Clone raymob template (with submodules)
         run: |
           git clone --recurse-submodules https://github.com/Bigfoot71/raymob.git
-          # Show contents for debugging
-          echo "Contents of cpp before cleaning:"
-          ls -la raymob/app/src/main/cpp/
-          echo "Contents of deps:"
-          ls -la raymob/app/src/main/cpp/deps/ || echo "deps missing"
-          # Remove everything except the deps folder
+          # Preserve only deps/ and CMakeLists.txt, remove example files
           cd raymob/app/src/main/cpp
-          find . -mindepth 1 -maxdepth 1 ! -name 'deps' -exec rm -rf {} +
-          echo "After cleaning:"
-          ls -la
+          find . -mindepth 1 -maxdepth 1 ! -name 'deps' ! -name 'CMakeLists.txt' -exec rm -rf {} +
+          ls -la   # Verify contents
 
       - name: Copy your game source into raymob
         run: |
-          # Copy all your source files into the cpp folder
-          cp -r game-source/src/* raymob/app/src/main/cpp/
-          cp -r game-source/app/* raymob/app/src/main/cpp/   # Adjust if needed
-          # Copy resources to the Android assets folder
+          # Copy source files, excluding any CMakeLists.txt from your project
+          rsync -av --exclude='CMakeLists.txt' game-source/src/ raymob/app/src/main/cpp/
+          rsync -av --exclude='CMakeLists.txt' game-source/app/ raymob/app/src/main/cpp/
+          # Copy resources to Android assets
           mkdir -p raymob/app/src/main/assets
           cp -r game-source/resources/* raymob/app/src/main/assets/
 
