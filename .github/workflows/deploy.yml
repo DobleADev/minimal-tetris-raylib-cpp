@@ -96,7 +96,7 @@ jobs:
         with:
           path: game-source
 
-      - name: Set up JDK
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -105,32 +105,30 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: tools platform-tools ndk;25.2.9519653
+          packages: tools platform-tools ndk;25.2.9519653  # Use a recent NDK
 
-      - name: Clone Raylib Android Template
+      - name: Clone raymob template (with submodules)
         run: |
-          git clone --depth 1 https://github.com/raysan5/raylib-game-template.git android-project
-          # Remove the example game
-          rm -rf android-project/game/src
+          git clone --recurse-submodules https://github.com/Bigfoot71/raymob.git
+          # Remove the example source files
+          rm -rf raymob/app/src/main/cpp/*
 
-      - name: Copy your game source into the template
+      - name: Copy your game source into raymob
         run: |
-          mkdir -p android-project/game/src
-          cp -r game-source/src/* android-project/game/src/
-          cp -r game-source/app/* android-project/game/src/   # adjust if your app sources are separate
-          cp -r game-source/resources android-project/game/assets/   # resources become assets
+          # Copy all your source files (from src/ and app/) into the cpp folder
+          cp -r game-source/src/* raymob/app/src/main/cpp/
+          cp -r game-source/app/* raymob/app/src/main/cpp/   # Adjust if needed
+          # Copy resources to the Android assets folder
+          mkdir -p raymob/app/src/main/assets
+          cp -r game-source/resources/* raymob/app/src/main/assets/
 
-      - name: Build APK
-        working-directory: android-project
+      - name: Build APK with Gradle
+        working-directory: raymob
         run: |
-          # The template uses a simple build.sh script that calls CMake with the NDK
-          chmod +x build.sh
-          ./build.sh -p android -b
-
-      - name: Rename APK with version
-        run: |
-          VERSION=${{ github.ref_name }}
-          mv android-project/build/android/game.apk game-android-${VERSION}.apk
+          chmod +x gradlew
+          ./gradlew assembleRelease
+          # The signed APK will be in app/build/outputs/apk/release/
+          cp app/build/outputs/apk/release/app-release.apk ../game-android-${{ github.ref_name }}.apk
 
       - name: Upload Android APK as artifact
         uses: actions/upload-artifact@v4
