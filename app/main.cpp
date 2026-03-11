@@ -38,7 +38,7 @@ int main() {
     InitAudioDevice();
     SetTargetFPS(60);
 
-    Font font = LoadFontEx("../resources/PressStart2P-Regular.ttf", 24, 0, 0);
+    Font font = LoadFontEx("resources/PressStart2P-Regular.ttf", 24, 0, 0);
     // Si falla, usar fuente por defecto
     if (font.texture.id == 0) font = GetFontDefault();
 
