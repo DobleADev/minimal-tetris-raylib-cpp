@@ -14,15 +14,10 @@ void GameRenderer::Draw(const GameState& state, double fallProgress)
     DrawGrid(state.GetGrid());
     if (!state.IsGameOver())
     {
-        DrawPiece(state.GetCurrentPiece(), 91, -29, fallProgress);
+        DrawPiece(state.GetCurrentPiece(), 241, -14, fallProgress);
     }
     
     DrawUI(state);
-
-    if (!state.IsGameOver())
-    {
-        DrawPiece(state.GetNextPiece(), 464, 260, 0.0); // ajusta según necesites
-    }
 }
 
 void GameRenderer::DrawGrid(const Grid &grid)
@@ -32,7 +27,7 @@ void GameRenderer::DrawGrid(const Grid &grid)
         for (int c = 0; c < grid.GetNumCols(); ++c)
         {
             int cellValue = grid.GetCell(r, c);
-            DrawRectangle(c * 30 + 91, r * 30 + 1, 29, 29, colors[cellValue]);
+            DrawRectangle(c * 30 + 241, r * 30 + 1, 29, 29, colors[cellValue]);
         }
     }
 }
@@ -63,7 +58,7 @@ void GameRenderer::DrawUI(const GameState &state)
 {
     screenWidth = GetScreenWidth();
     screenHeight = GetScreenHeight();
-    float rightMargin = 200;
+    float rightMargin = 125;
     float verticalGap = 16;
     float nextVerticalPosition = 0;
 
@@ -108,6 +103,9 @@ void GameRenderer::DrawUI(const GameState &state)
     float nextBlockRectangleYPosition = nextVerticalPosition;
     DrawRectangleRounded({nextBlockRectangleXPosition, nextBlockRectangleYPosition, nextBlockRectangleWidth, nextBlockRectangleHeight}, 0.3, 6, lightBlue);
     nextVerticalPosition += nextBlockRectangleHeight + verticalGap;
+    
+    // NEXT BLOCK PIECE
+    DrawPiece(state.GetNextPiece(), nextBlockRectangleXPosition - 55, 260, 0.0);
 
     // STARTUP
     if (state.IsGameOver())

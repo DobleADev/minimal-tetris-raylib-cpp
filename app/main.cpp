@@ -16,7 +16,7 @@ AudioManager* audio;
 
 void UpdateFrame() {
     double deltaTime = GetFrameTime(); // en lugar de nuestro propio cálculo
-
+    
     audio->UpdateMusic();
 
     InputAction action = input->GetAction();

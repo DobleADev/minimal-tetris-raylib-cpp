@@ -112,7 +112,7 @@ void GameState::Update(double deltaTime)
     double effectiveInterval = softDropHeld ? fallInterval / 5.0 : fallInterval;
     fallProgress += deltaTime / effectiveInterval;
 
-    while (fallProgress >= 1.0)
+    while (fallProgress >= 0.5)
     {
         fallProgress -= 1.0;
 
