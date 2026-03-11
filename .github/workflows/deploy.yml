@@ -162,6 +162,35 @@ jobs:
             echo "No custom icon provided; using default raymob icon."
           fi
 
+      - name: Set Android version from Git tag
+        if: startsWith(github.ref, 'refs/tags/')
+        working-directory: raymob
+        run: |
+          # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
+          TAG="${{ github.ref_name }}"
+          VERSION_NAME="${TAG#v}"  # Remove leading 'v' if present
+          echo "Version name: $VERSION_NAME"
+
+          # Parse version components (assumes format major.minor.patch)
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_NAME"
+          # Remove any non-numeric suffix like -rc1 (optional)
+          MAJOR="${MAJOR//[!0-9]/}"
+          MINOR="${MINOR//[!0-9]/}"
+          PATCH="${PATCH//[!0-9]/}"
+          # Calculate versionCode: major*10000 + minor*100 + patch
+          VERSION_CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
+          echo "Version code: $VERSION_CODE"
+
+          # Write to gradle.properties (create if missing)
+          if [ -f gradle.properties ]; then
+            # Replace or add entries
+            sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$VERSION_NAME/" gradle.properties || echo "VERSION_NAME=$VERSION_NAME" >> gradle.properties
+            sed -i "s/^VERSION_CODE=.*/VERSION_CODE=$VERSION_CODE/" gradle.properties || echo "VERSION_CODE=$VERSION_CODE" >> gradle.properties
+          else
+            echo "VERSION_NAME=$VERSION_NAME" > gradle.properties
+            echo "VERSION_CODE=$VERSION_CODE" >> gradle.properties
+          fi
+
       # --- Build & Sign ---
       - name: Build APK (debug)
         working-directory: raymob
