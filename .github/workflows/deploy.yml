@@ -105,17 +105,25 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: tools platform-tools ndk;25.2.9519653  # Use a recent NDK
+          packages: tools platform-tools ndk;25.2.9519653
 
       - name: Clone raymob template (with submodules)
         run: |
           git clone --recurse-submodules https://github.com/Bigfoot71/raymob.git
-          # Remove the example source files
-          rm -rf raymob/app/src/main/cpp/*
+          # Show contents for debugging
+          echo "Contents of cpp before cleaning:"
+          ls -la raymob/app/src/main/cpp/
+          echo "Contents of deps:"
+          ls -la raymob/app/src/main/cpp/deps/ || echo "deps missing"
+          # Remove everything except the deps folder
+          cd raymob/app/src/main/cpp
+          find . -mindepth 1 -maxdepth 1 ! -name 'deps' -exec rm -rf {} +
+          echo "After cleaning:"
+          ls -la
 
       - name: Copy your game source into raymob
         run: |
-          # Copy all your source files (from src/ and app/) into the cpp folder
+          # Copy all your source files into the cpp folder
           cp -r game-source/src/* raymob/app/src/main/cpp/
           cp -r game-source/app/* raymob/app/src/main/cpp/   # Adjust if needed
           # Copy resources to the Android assets folder
@@ -127,7 +135,6 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease
-          # The signed APK will be in app/build/outputs/apk/release/
           cp app/build/outputs/apk/release/app-release.apk ../game-android-${{ github.ref_name }}.apk
 
       - name: Upload Android APK as artifact
