@@ -107,6 +107,17 @@ jobs:
         with:
           packages: tools platform-tools ndk;25.2.9519653
 
+      - name: Install CMake 3.30.3
+        run: |
+          # Download the pre-built CMake binary for Linux
+          wget https://github.com/Kitware/CMake/releases/download/v3.30.3/cmake-3.30.3-linux-x86_64.tar.gz
+          tar -xzf cmake-3.30.3-linux-x86_64.tar.gz
+          # Move it to /opt and create a symlink in /usr/local/bin
+          sudo mv cmake-3.30.3-linux-x86_64 /opt/cmake-3.30.3
+          sudo ln -sf /opt/cmake-3.30.3/bin/cmake /usr/local/bin/cmake
+          # Verify installation
+          cmake --version
+
       - name: Clone raymob template (with submodules)
         run: |
           git clone --recurse-submodules https://github.com/Bigfoot71/raymob.git
