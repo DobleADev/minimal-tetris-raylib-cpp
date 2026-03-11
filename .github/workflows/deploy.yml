@@ -122,13 +122,12 @@ jobs:
           # Keep deps and CMakeLists.txt, remove example source
           find . -mindepth 1 -maxdepth 1 ! -name 'deps' ! -name 'CMakeLists.txt' -exec rm -rf {} +
 
-      - name: Copy your game source
+      - name: Copy your game source and resources
         run: |
           rsync -av --exclude='CMakeLists.txt' game-source/src/ raymob/app/src/main/cpp/
           rsync -av --exclude='CMakeLists.txt' game-source/app/ raymob/app/src/main/cpp/
-          # Copy resources to assets
-          mkdir -p raymob/app/src/main/assets
-          cp -r game-source/resources/* raymob/app/src/main/assets/
+          # Copy the entire resources folder (preserve structure)
+          cp -r game-source/resources raymob/app/src/main/assets/
 
       # --- Customization: Package & App Name ---
       - name: Override app name and package
