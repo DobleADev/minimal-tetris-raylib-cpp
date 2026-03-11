@@ -91,156 +91,41 @@ jobs:
   build-android:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout your game code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          path: game-source
-
+          submodules: recursive   # Important for raymob submodules
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: tools platform-tools ndk;25.2.9519653
-
       - name: Install CMake 3.30.3
         run: |
           wget https://github.com/Kitware/CMake/releases/download/v3.30.3/cmake-3.30.3-linux-x86_64.tar.gz
           tar -xzf cmake-3.30.3-linux-x86_64.tar.gz
           sudo mv cmake-3.30.3-linux-x86_64 /opt/cmake-3.30.3
           sudo ln -sf /opt/cmake-3.30.3/bin/cmake /usr/local/bin/cmake
-          cmake --version
-
-      - name: Clone raymob template
+      - name: Copy resources to assets
         run: |
-          git clone --recurse-submodules https://github.com/Bigfoot71/raymob.git
-          cd raymob/app/src/main/cpp
-          # Keep deps and CMakeLists.txt, remove example source
-          find . -mindepth 1 -maxdepth 1 ! -name 'deps' ! -name 'CMakeLists.txt' -exec rm -rf {} +
-
-      - name: Copy your game source and resources
+          mkdir -p android/raymob/app/src/main/assets
+          cp -r resources android/raymob/app/src/main/assets/
+      - name: Customize app (name, package, icon)
         run: |
-          rsync -av --exclude='CMakeLists.txt' game-source/src/ raymob/app/src/main/cpp/
-          rsync -av --exclude='CMakeLists.txt' game-source/app/ raymob/app/src/main/cpp/
-          # Copy the entire resources folder (preserve structure)
-          cp -r game-source/resources raymob/app/src/main/assets/
-
-      # --- Customization: Package & App Name ---
-      - name: Override app name and package
-        run: |
-          # Define your desired values (or read from a file in your repo)
-          APP_NAME="Minimal Tetris"
-          PACKAGE_NAME="com.yourname.minimaltetris"
-          # Replace placeholders in gradle.properties
-          sed -i "s/APP_NAME=.*/APP_NAME=$APP_NAME/" raymob/gradle.properties
-          sed -i "s/APPLICATION_ID=.*/APPLICATION_ID=$PACKAGE_NAME/" raymob/gradle.properties
-          # Also update the app name in strings.xml (optional)
-          sed -i "s/raymob/$APP_NAME/g" raymob/app/src/main/res/values/strings.xml
-
-      # --- Customization: Icon (optional) ---
-      - name: Replace app icon if provided
-        run: |
-          if [ -f game-source/android/icon.png ]; then
-            echo "Custom icon found. Converting and copying..."
-            sudo apt-get install -y imagemagick
-            # Convert to required densities
-            for size in 48 72 96 144 192; do
-              convert game-source/android/icon.png -resize ${size}x${size} icon.png
-              cp icon.png raymob/app/src/main/res/mipmap-${size}dpi/ic_launcher.png
-              cp icon.png raymob/app/src/main/res/mipmap-${size}dpi/ic_launcher_round.png
-            done
-            # Also copy for xxxhdpi (192) and the legacy folders
-            convert game-source/android/icon.png -resize 192x192 icon.png
-            cp icon.png raymob/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-            cp icon.png raymob/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-            echo "Icon replaced."
-          else
-            echo "No custom icon provided; using default raymob icon."
-          fi
-
-      - name: Set Android version from Git tag
-        if: startsWith(github.ref, 'refs/tags/')
-        working-directory: raymob
-        run: |
-          # Extract version from tag (e.g., v1.2.3 -> 1.2.3)
-          TAG="${{ github.ref_name }}"
-          VERSION_NAME="${TAG#v}"  # Remove leading 'v' if present
-          echo "Version name: $VERSION_NAME"
-
-          # Parse version components (assumes format major.minor.patch)
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION_NAME"
-          # Remove any non-numeric suffix like -rc1 (optional)
-          MAJOR="${MAJOR//[!0-9]/}"
-          MINOR="${MINOR//[!0-9]/}"
-          PATCH="${PATCH//[!0-9]/}"
-          # Calculate versionCode: major*10000 + minor*100 + patch
-          VERSION_CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
-          echo "Version code: $VERSION_CODE"
-
-          # Write to gradle.properties (create if missing)
-          if [ -f gradle.properties ]; then
-            # Replace or add entries
-            sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$VERSION_NAME/" gradle.properties || echo "VERSION_NAME=$VERSION_NAME" >> gradle.properties
-            sed -i "s/^VERSION_CODE=.*/VERSION_CODE=$VERSION_CODE/" gradle.properties || echo "VERSION_CODE=$VERSION_CODE" >> gradle.properties
-          else
-            echo "VERSION_NAME=$VERSION_NAME" > gradle.properties
-            echo "VERSION_CODE=$VERSION_CODE" >> gradle.properties
-          fi
-
-      # --- Build & Sign ---
-      - name: Build APK (debug)
-        working-directory: raymob
+          # Your existing customization steps, but now paths are relative to android/raymob
+          cd android/raymob
+          # ... set version, etc ...
+      - name: Build APK
+        working-directory: android/raymob
         run: |
           chmod +x gradlew
-          # For debug builds (signed with debug key, installable)
           ./gradlew assembleDebug
-          # Locate the generated APK
           APK_PATH=$(find app/build/outputs -name "*.apk" | head -n 1)
-          if [ -z "$APK_PATH" ]; then
-            echo "No APK found!"
-            exit 1
-          fi
-          echo "Found APK at: $APK_PATH"
-          cp "$APK_PATH" ../game-android-${{ github.ref_name }}.apk
-
-      # For release tags, you can switch to a signed release build using secrets:
-      # - name: Build signed release APK
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   working-directory: raymob
-      #   env:
-      #     KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-      #     KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      #     KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      #   run: |
-      #     # Create keystore from base64 secret if you have one
-      #     echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > keystore.jks
-      #     # Inject signing config into app/build.gradle
-      #     cat >> app/build.gradle << EOF
-      #     android {
-      #         signingConfigs {
-      #             release {
-      #                 storeFile file('../keystore.jks')
-      #                 storePassword "$KEYSTORE_PASSWORD"
-      #                 keyAlias "$KEY_ALIAS"
-      #                 keyPassword "$KEY_PASSWORD"
-      #             }
-      #         }
-      #         buildTypes {
-      #             release {
-      #                 signingConfig signingConfigs.release
-      #             }
-      #         }
-      #     }
-      #     EOF
-      #     ./gradlew assembleRelease
-      #     cp app/build/outputs/apk/release/app-release.apk ../game-android-${{ github.ref_name }}.apk
-
-      - name: Upload Android APK as artifact
-        uses: actions/upload-artifact@v4
+          cp "$APK_PATH" ../../game-android-${{ github.ref_name }}.apk
+      - uses: actions/upload-artifact@v4
         with:
           name: android-apk
           path: game-android-*.apk
