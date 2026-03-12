@@ -19,6 +19,7 @@ static PieceVisual pieceVisual;
 Texture2D blockTexture;
 
 void UpdateFrame() {
+    SetGesturesEnabled(GESTURE_DRAG | GESTURE_SWIPE_DOWN | GESTURE_TAP | GESTURE_HOLD);
     double deltaTime = GetFrameTime(); // en lugar de nuestro propio cálculo
     
     audio->UpdateMusic();
