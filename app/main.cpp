@@ -8,7 +8,7 @@
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
 #endif
-#include <PieceVisual.h>
+#include "PieceVisual.h"
 #include "Transform2D.h"
 
 GameState* gameState;
