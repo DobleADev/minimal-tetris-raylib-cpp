@@ -22,6 +22,7 @@ void UpdateFrame() {
     double deltaTime = GetFrameTime(); // en lugar de nuestro propio cálculo
     
     audio->UpdateMusic();
+    input->UpdateTouch();
 
     InputAction action = input->GetAction();
     gameState->HandleInput(action);

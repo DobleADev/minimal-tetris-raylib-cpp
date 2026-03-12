@@ -69,19 +69,6 @@ void GameState::HandleInput(InputAction action)
         if (!PieceFits(currentPiece) || IsPieceOutside(currentPiece))
             currentPiece.Move(0, -1);
         break;
-    case InputAction::MoveDown:
-        // Movimiento manual (soft drop)
-        currentPiece.Move(1, 0);
-        if (!PieceFits(currentPiece) || IsPieceOutside(currentPiece))
-        {
-            currentPiece.Move(-1, 0);
-            LockPiece();
-        }
-        else
-        {
-            softDropMoves++; // contar para puntuación
-        }
-        break;
     case InputAction::Rotate:
     {
         int oldRot = currentPiece.GetRotation(); // Necesitamos añadir getter/setter de rotación en Tetromino
