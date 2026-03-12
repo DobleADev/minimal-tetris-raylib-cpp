@@ -1,44 +1,73 @@
 // InputHandler.cpp
 #include "InputHandler.h"
-#include "raylib.h"
 #include <cmath>
+#include <raymath.h>
 
-InputHandler::InputHandler() : dragAccumX(0.0f) {}
+InputHandler::InputHandler()
+    : mousePressed(false)
+    , mousePressPos{0,0}
+    , dragAccumX(0.0f)
+    , clickDetected(false)
+{}
 
-void InputHandler::UpdateTouch() {
-    mobileInput.Update();
-    ProcessDrag();
+void InputHandler::Update() {
+    ProcessMouse();
 }
 
-void InputHandler::ProcessDrag() {
-    if (mobileInput.GetTouchCount() > 0) {
-        Vector2 delta = mobileInput.GetDragDelta();
-        dragAccumX += delta.x;
-    } else {
+void InputHandler::ProcessMouse() {
+    bool leftDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+    Vector2 currentMouse = GetMousePosition();
+
+    if (leftDown && !mousePressed) {
+        // Inicio de presión
+        mousePressed = true;
+        mousePressPos = currentMouse;
+        dragAccumX = 0.0f;
+        clickDetected = false;  // aún no sabemos si será clic
+    }
+    else if (leftDown && mousePressed) {
+        // Arrastrando: calculamos desplazamiento horizontal desde el inicio
+        float deltaX = currentMouse.x - mousePressPos.x;
+        dragAccumX = deltaX;  // usamos la distancia total, no acumulamos frame a frame
+        // Para soft drop, usamos el desplazamiento vertical actual
+        // (se evaluará en IsSoftDropHeld)
+    }
+    else if (!leftDown && mousePressed) {
+        // Se soltó el botón
+        float dist = Vector2Distance(mousePressPos, currentMouse);
+        if (dist < CLICK_THRESHOLD) {
+            clickDetected = true;
+        }
+        mousePressed = false;
         dragAccumX = 0.0f;
     }
 }
 
 InputAction InputHandler::GetAction() {
-    // 1. Click táctil
-    if (mobileInput.IsClickDetected()) {
+    // 1. Clic detectado al soltar (rotar)
+    if (clickDetected) {
+        clickDetected = false;  // reset
         return InputAction::Rotate;
     }
 
-    // 2. Swipe hacia abajo (gesto rápido)
-    int gesture = mobileInput.GetCurrentGesture();
-    if (gesture == GESTURE_SWIPE_DOWN) {
-        return InputAction::HardDrop;
-    }
-
-    // 3. Movimiento horizontal por arrastre (acumulador por frame)
-    if (std::abs(dragAccumX) >= DRAG_THRESHOLD) {
+    // 2. Movimiento horizontal por arrastre (usando la distancia total)
+    if (mousePressed && std::abs(dragAccumX) >= DRAG_THRESHOLD) {
         InputAction action = (dragAccumX > 0) ? InputAction::MoveRight : InputAction::MoveLeft;
-        dragAccumX -= (dragAccumX > 0) ? DRAG_THRESHOLD : -DRAG_THRESHOLD;
+        // Consumimos el umbral para que no se repita infinitamente
+        // Reiniciamos la posición de referencia para el próximo umbral
+        // Una forma sencilla es resetear dragAccumX a 0 después de generar el movimiento,
+        // pero eso perdería el arrastre restante. Mejor: restamos el umbral y mantenemos el resto.
+        // Para ello, necesitamos actualizar mousePressPos.x sumando o restando el umbral.
+        if (dragAccumX > 0) {
+            mousePressPos.x += DRAG_THRESHOLD;
+        } else {
+            mousePressPos.x -= DRAG_THRESHOLD;
+        }
+        dragAccumX = GetMousePosition().x - mousePressPos.x;  // recalculamos
         return action;
     }
 
-    // 4. Teclado
+    // 3. Teclado (para PC)
     if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) return InputAction::MoveLeft;
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) return InputAction::MoveRight;
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) return InputAction::Rotate;
@@ -51,12 +80,12 @@ bool InputHandler::IsSoftDropHeld() const {
     // Teclado
     bool keyHeld = IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S);
 
-    // Táctil: arrastre hacia abajo en el frame actual
-    bool touchHeld = false;
-    if (mobileInput.GetTouchCount() > 0) {
-        Vector2 delta = mobileInput.GetDragDelta();
-        touchHeld = (delta.y > SOFT_DROP_THRESHOLD);
+    // Ratón: arrastre hacia abajo durante la presión
+    bool mouseHeld = false;
+    if (mousePressed) {
+        float deltaY = GetMousePosition().y - mousePressPos.y;
+        mouseHeld = (deltaY > SOFT_DROP_THRESHOLD);
     }
 
-    return keyHeld || touchHeld;
+    return keyHeld || mouseHeld;
 }

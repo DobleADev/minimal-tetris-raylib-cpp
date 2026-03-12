@@ -65,6 +65,7 @@ void MobileInput::Update()
     // --- SIMULACIÓN CON RATÓN ---
     if (simulateWithMouse && realTouchCount == 0)
     {
+        TraceLog(LOG_INFO, "SIMulación activa - mousePressed: %d, delta: (%f, %f)", mousePressed, simulatedDragDelta.x, simulatedDragDelta.y);
         // Usamos el ratón como un único punto táctil
         bool leftDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
         Vector2 currentMouse = GetMousePosition();

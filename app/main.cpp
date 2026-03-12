@@ -23,9 +23,13 @@ Texture2D blockTexture;
 void UpdateFrame() {
     double deltaTime = GetFrameTime(); // en lugar de nuestro propio cálculo
     Vector2 mouse = GetMousePosition();
-    startButton->Update(mouse);
+    if (gameState->IsGameOver())
+    {
+        startButton->Update(mouse);
+    }
     audio->UpdateMusic();
-    input->UpdateTouch();
+    // input->UpdateTouch();
+    input->Update();
 
     InputAction action = input->GetAction();
     gameState->HandleInput(action);

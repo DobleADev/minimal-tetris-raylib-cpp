@@ -1,21 +1,32 @@
 // InputHandler.h
 #pragma once
 #include "InputAction.h"
-#include "MobileInput.h"
+#include "raylib.h"
 
 class InputHandler {
 public:
     InputHandler();
     
-    void UpdateTouch();
-    InputAction GetAction();        // ya no es const porque modifica acumuladores
+    // Debe llamarse una vez por frame para actualizar el estado del ratón
+    void Update();
+
+    // Devuelve la acción discreta detectada en este frame
+    InputAction GetAction();
+
+    // Indica si el soft drop está siendo sostenido (arrastre hacia abajo)
     bool IsSoftDropHeld() const;
 
 private:
-    MobileInput mobileInput;
-    float dragAccumX;                // ya no es mutable
-    static constexpr float DRAG_THRESHOLD = 30.0f;      // píxeles para mover una casilla
-    static constexpr float SOFT_DROP_THRESHOLD = 5.0f;  // píxeles/frame para activar soft drop
+    // Estado del ratón para arrastre
+    bool mousePressed;           // ¿Está presionado el botón izquierdo?
+    Vector2 mousePressPos;       // Posición donde se presionó
+    float dragAccumX;            // Acumulador de desplazamiento horizontal
+    bool clickDetected;          // Se ha detectado un clic (para rotar)
 
-    void ProcessDrag();
+    // Umbrales
+    static constexpr float DRAG_THRESHOLD = 30.0f;      // píxeles para mover una casilla
+    static constexpr float CLICK_THRESHOLD = 10.0f;     // píxeles máximos para considerar clic
+    static constexpr float SOFT_DROP_THRESHOLD = 75.0f;  // píxeles/frame para activar soft drop
+
+    void ProcessMouse();
 };

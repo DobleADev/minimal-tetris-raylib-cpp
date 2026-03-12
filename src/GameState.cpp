@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <random>
 
-const double GameState::fallInterval = 0.4; // 0.4 segundos por celda
+const double GameState::fallInterval = 0.8; // 0.4 segundos por celda
 
 GameState::GameState()
     : grid(),
