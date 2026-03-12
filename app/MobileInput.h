@@ -33,6 +33,8 @@ public:
     int GetLogSize() const;
 
     void DrawDebugOverlay(Vector2 lastGesturePos, Vector2 logPos, Vector2 protractorPos);
+    void SetSimulateWithMouse(bool enable);  // activar/desactivar simulación
+    bool IsSimulatingWithMouse() const;
 
 private:
     Vector2 dragVector;
@@ -66,4 +68,14 @@ private:
     void UpdateProtractor();
     static const char* GetGestureName(int gesture);
     static Color GetGestureColor(int gesture);
+
+    // Simulación con ratón
+    bool simulateWithMouse;          // true = usar ratón cuando no hay toques
+    bool mousePressed;               // estado del botón izquierdo
+    Vector2 mousePressPos;            // posición donde se presionó
+    Vector2 mouseLastPos;             // última posición del ratón (para delta)
+    Vector2 simulatedDragVector;      // vector de arrastre simulado (desde press)
+    Vector2 simulatedDragDelta;       // delta entre frames
+    bool mouseClickDetected;          // click simulado
+    float mouseMaxDragDistance;       // distancia máxima durante la presión
 };

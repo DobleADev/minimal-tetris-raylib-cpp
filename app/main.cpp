@@ -10,18 +10,20 @@
 #endif
 #include "PieceVisual.h"
 #include "Transform2D.h"
+#include "Button.h"
 
 GameState* gameState;
 GameRenderer* renderer;
 InputHandler* input;
 AudioManager* audio;
+Button* startButton = nullptr;
 static PieceVisual pieceVisual;
 Texture2D blockTexture;
 
 void UpdateFrame() {
-    SetGesturesEnabled(GESTURE_DRAG | GESTURE_SWIPE_DOWN | GESTURE_TAP | GESTURE_HOLD);
     double deltaTime = GetFrameTime(); // en lugar de nuestro propio cálculo
-    
+    Vector2 mouse = GetMousePosition();
+    startButton->Update(mouse);
     audio->UpdateMusic();
     input->UpdateTouch();
 
@@ -56,6 +58,10 @@ void UpdateFrame() {
     
     renderer->DrawUI(*gameState);
     // Dibujar overlay de game over si es necesario
+    if (gameState->IsGameOver())
+    {
+        startButton->Draw();
+    }
     EndDrawing();
 }
 
@@ -63,7 +69,13 @@ int main() {
     InitWindow(800, 600, "Minimal Tetris");
     InitAudioDevice();
     SetTargetFPS(60);
-
+    SetGesturesEnabled(GESTURE_DRAG | GESTURE_SWIPE_DOWN | GESTURE_TAP | GESTURE_HOLD);
+    Texture2D btnTex = LoadTexture("resources/start-btn.png");   // más directo que LoadTextureFromImage
+    Sound btnSound = LoadSound("resources/rotate-block.wav");
+    startButton = new Button(btnTex, { 400 - 100, 300 }, { 4, 4}, 3, btnSound);
+    startButton->SetOnClick([]() {
+        gameState->HandleInput(InputAction::Restart);
+    });
     blockTexture = LoadTextureFromImage(LoadImage("resources/block.png"));
     blockTexture.format = PIXELFORMAT_COMPRESSED_DXT1_RGB;
     Font font = LoadFontEx("resources/PressStart2P-Regular.ttf", 24, 0, 0);
@@ -82,7 +94,7 @@ int main() {
         UpdateFrame();
     }
 #endif
-
+    delete startButton; 
     delete audio;
     delete input;
     delete renderer;

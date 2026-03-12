@@ -60,8 +60,8 @@ void GameRenderer::DrawPiece(const Tetromino& piece, const Transform2D& transfor
     }
 }
 
-const char *startLabel = "Press [ENTER] to start a new game";
-int startLabelSize = 16;
+const char *startLabel = "Minimal Tetris";
+int startLabelSize = 36;
 float startLabelBlinkRate = 4;
 
 double blockFallSpeedRate = 0.4;
@@ -130,8 +130,8 @@ void GameRenderer::DrawUI(const GameState &state)
         float t = GetTime() * startLabelBlinkRate;
         int alpha = (int)abs(sin(t) * 255);
         Color whiteBlink = {255, 255, 255, static_cast<unsigned char>(15 + alpha * 0.9)};
-        DrawTextEx(font, startLabel, {(float)((screenWidth / 2) - (textWidth)), (float)(screenHeight / 2)}, startLabelSize, 2, whiteBlink);
-
+        
         DrawRectangleGradientV(0, 0, screenWidth, screenHeight, Color({64, 0, 255, 0}), Color({0, 127, 255, static_cast<unsigned char>(97 + alpha * 0.3)}));
+        DrawTextEx(font, startLabel, {(float)((screenWidth / 2) - (textWidth)), (float)(screenHeight / 2) - 64}, startLabelSize, 2, whiteBlink);
     }
 }

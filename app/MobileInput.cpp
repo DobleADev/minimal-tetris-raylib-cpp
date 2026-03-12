@@ -37,6 +37,14 @@ MobileInput::MobileInput()
     , touchStartPos{0,0}
     , maxDragDistance(0.0f)
     , clickDetected(false)
+    , simulateWithMouse(true)
+    , mousePressed(false)
+    , mousePressPos{0,0}
+    , mouseLastPos{0,0}
+    , simulatedDragVector{0,0}
+    , simulatedDragDelta{0,0}
+    , mouseClickDetected(false)
+    , mouseMaxDragDistance(0.0f)
 {
     for (int i = 0; i < GESTURE_LOG_SIZE; ++i)
         gestureLog[i][0] = '\0';
@@ -44,71 +52,150 @@ MobileInput::MobileInput()
 
 void MobileInput::Update()
 {
-    // Guardar estado anterior de toque
+    // Guardar estado anterior de toque real
     bool wasTouchActive = touchActive;
 
-    // Obtener datos actuales de raylib
+    // Obtener datos de raylib (siempre, aunque luego los sobreescribamos con simulación)
     currentGesture = GetGestureDetected();
     currentDragDegrees = GetGestureDragAngle();
     currentPitchDegrees = GetGesturePinchAngle();
-    touchCount = GetTouchPointCount();
+    int realTouchCount = GetTouchPointCount();
     mousePosition = GetMousePosition();
 
-    Vector2 newDragVector = (touchCount > 0) ? GetGestureDragVector() : Vector2{0,0};
-    dragDelta = newDragVector - previousDragVector;
-    dragVector = newDragVector;
-    previousDragVector = dragVector;
+    // --- SIMULACIÓN CON RATÓN ---
+    if (simulateWithMouse && realTouchCount == 0)
+    {
+        // Usamos el ratón como un único punto táctil
+        bool leftDown = IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+        Vector2 currentMouse = GetMousePosition();
 
-    // Actualizar vector de arrastre solo si hay toques
-    if (touchCount > 0) {
-        dragVector = GetGestureDragVector();
-    } else {
-        dragVector = {0,0};
-    }
-
-    // Detección de click
-    if (touchCount > 0) {
-        // Hay toques activos
-        Vector2 currentPos = GetTouchPosition(0); // usamos el primer toque
-        if (!wasTouchActive) {
-            // Inicio del toque
-            touchActive = true;
-            touchStartPos = currentPos;
+        if (leftDown && !mousePressed)
+        {
+            // Presionó el ratón
+            mousePressed = true;
+            mousePressPos = currentMouse;
+            mouseLastPos = currentMouse;
+            simulatedDragVector = {0,0};
+            simulatedDragDelta = {0,0};
+            mouseMaxDragDistance = 0.0f;
+            touchActive = true;  // para la lógica de click
+            touchStartPos = currentMouse;  // reutilizamos variables de toque real
             maxDragDistance = 0.0f;
-        } else {
-            // Durante el toque, actualizar distancia máxima
-            float dist = Vector2Distance(touchStartPos, currentPos);
-            if (dist > maxDragDistance) maxDragDistance = dist;
         }
-    } else {
-        // No hay toques
-        if (wasTouchActive) {
-            // Final del toque
-            if (maxDragDistance < CLICK_DRAG_THRESHOLD) {
-                clickDetected = true;  // se generó un click
+        else if (leftDown && mousePressed)
+        {
+            // Arrastrando
+            Vector2 delta = currentMouse - mouseLastPos;
+            simulatedDragDelta = delta;
+            simulatedDragVector = currentMouse - mousePressPos;
+            mouseLastPos = currentMouse;
+
+            float dist = Vector2Distance(mousePressPos, currentMouse);
+            if (dist > mouseMaxDragDistance) mouseMaxDragDistance = dist;
+            // Actualizar también las variables de toque real (para que IsClickDetected funcione)
+            maxDragDistance = mouseMaxDragDistance;
+        }
+        else if (!leftDown && mousePressed)
+        {
+            // Soltó el ratón
+            if (mouseMaxDragDistance < CLICK_DRAG_THRESHOLD)
+            {
+                mouseClickDetected = true;
             }
-            touchActive = false;
+            mousePressed = false;
+            simulatedDragVector = {0,0};
+            simulatedDragDelta = {0,0};
+            touchActive = false;  // para la lógica de click
+        }
+
+        // Configurar variables de "toque" para el resto del sistema
+        touchCount = mousePressed ? 1 : 0;
+        if (touchCount > 0)
+        {
+            touchPositions[0] = currentMouse;
+        }
+        // Los gestos (currentGesture, etc.) los dejamos como están (0)
+        // Pero podríamos simular algunos gestos si quisiéramos (por ahora no)
+    }
+    else
+    {
+        // Modo normal: usar datos reales de toque
+        touchCount = realTouchCount;
+        dragVector = (touchCount > 0) ? GetGestureDragVector() : Vector2{0,0};
+        // Nota: dragDelta se calculará más abajo de forma unificada
+        // Restaurar variables de simulación a estado neutro
+        mousePressed = false;
+        simulatedDragVector = {0,0};
+        simulatedDragDelta = {0,0};
+    }
+
+    // --- Lógica común de detección de click (usando touchActive y maxDragDistance) ---
+    // (Ya se maneja dentro de la simulación o con toques reales)
+    // Pero necesitamos unificar: para toques reales, la detección de click ya está en el código anterior.
+    // Vamos a reestructurar: la detección de click se basa en touchActive y maxDragDistance,
+    // que ya se actualizan tanto en modo real como simulado.
+
+    // Para toques reales, necesitamos mantener touchActive y maxDragDistance.
+    // Añadimos esa lógica si no estamos en simulación:
+    if (!simulateWithMouse || realTouchCount > 0)
+    {
+        // Toques reales
+        if (touchCount > 0)
+        {
+            Vector2 currentPos = GetTouchPosition(0);
+            if (!wasTouchActive)
+            {
+                touchActive = true;
+                touchStartPos = currentPos;
+                maxDragDistance = 0.0f;
+            }
+            else
+            {
+                float dist = Vector2Distance(touchStartPos, currentPos);
+                if (dist > maxDragDistance) maxDragDistance = dist;
+            }
+            // Actualizar dragVector y dragDelta (para que estén disponibles)
+            Vector2 newDrag = GetGestureDragVector(); // ya lo tenemos arriba
+            dragDelta = newDrag - previousDragVector;
+            previousDragVector = newDrag;
+        }
+        else
+        {
+            if (wasTouchActive)
+            {
+                if (maxDragDistance < CLICK_DRAG_THRESHOLD)
+                {
+                    clickDetected = true;
+                }
+                touchActive = false;
+            }
+            dragVector = {0,0};
+            dragDelta = {0,0};
+            previousDragVector = {0,0};
         }
     }
 
-    // Actualizar último gesto significativo
+    // Para la simulación, ya hemos actualizado clickDetected (usamos mouseClickDetected)
+    // Unificamos: al final, clickDetened se obtiene de donde corresponda.
+    // Podemos hacer que clickDetected sea true si mouseClickDetened es true.
+    if (mouseClickDetected)
+    {
+        clickDetected = true;
+        mouseClickDetected = false;
+    }
+
+    // Actualizar último gesto significativo (solo para toques reales, ignoramos simulación)
     if (currentGesture != 0 && currentGesture != GESTURE_HOLD && currentGesture != previousGesture)
         lastGesture = currentGesture;
 
-    // Actualizar registro de gestos (solo para gestos, no para click)
+    // Actualizar registro de gestos (solo para gestos reales)
     UpdateLog(currentGesture);
 
-    // Actualizar transportador
+    // Actualizar transportador (usa currentGesture, que puede ser 0 en simulación)
     UpdateProtractor();
 
-    // Obtener posiciones táctiles
-    for (int i = 0; i < touchCount && i < MAX_TOUCH_COUNT; ++i)
-        touchPositions[i] = GetTouchPosition(i);
-}
-
-Vector2 MobileInput::GetDragDelta() const
-{
-    return dragDelta;
+    // Para la simulación, también podríamos generar gestos simulados (como arrastre) si queremos,
+    // pero por ahora no es necesario.
 }
 
 bool MobileInput::IsClickDetected()
@@ -319,12 +406,33 @@ void MobileInput::DrawDebugOverlay(Vector2 lastGesturePos, Vector2 logPos, Vecto
 
 Vector2 MobileInput::GetDragVector() const
 {
-    return dragVector;
+    if (simulateWithMouse && mousePressed)
+        return simulatedDragVector;
+    else
+        return dragVector;
 }
 
-float MobileInput::GetDragDistance() const
+Vector2 MobileInput::GetDragDelta() const
 {
-    return Vector2Length(dragVector);
+    if (simulateWithMouse && mousePressed)
+        return simulatedDragDelta;
+    else
+        return dragDelta;
+}
+
+void MobileInput::SetSimulateWithMouse(bool enable)
+{
+    simulateWithMouse = enable;
+    // Reiniciar estado de simulación al cambiar
+    mousePressed = false;
+    mouseClickDetected = false;
+    simulatedDragVector = {0,0};
+    simulatedDragDelta = {0,0};
+}
+
+bool MobileInput::IsSimulatingWithMouse() const
+{
+    return simulateWithMouse;
 }
 
 // --- Funciones estáticas auxiliares ---
