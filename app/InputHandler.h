@@ -26,7 +26,8 @@ private:
     // Umbrales
     static constexpr float DRAG_THRESHOLD = 30.0f;      // píxeles para mover una casilla
     static constexpr float CLICK_THRESHOLD = 10.0f;     // píxeles máximos para considerar clic
-    static constexpr float SOFT_DROP_THRESHOLD = 75.0f;  // píxeles/frame para activar soft drop
+    static constexpr float SOFT_DROP_THRESHOLD = 30.0f;  // píxeles/frame para activar soft drop
+    static constexpr float SOFT_DROP_HOLD_TIME = 0.5f;
 
     void ProcessMouse();
 };

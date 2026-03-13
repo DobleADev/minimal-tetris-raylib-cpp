@@ -10,6 +10,7 @@ public:
     GameState();
     void Reset();
     void HandleInput(InputAction action);
+    bool TryHardDrop();
     void Update(double deltaTime); // Para caída automática
     bool IsGameOver() const { return gameOver; }
     int GetScore() const { return score; }

@@ -72,10 +72,12 @@ InputAction InputHandler::GetAction() {
     if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) return InputAction::MoveRight;
     if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) return InputAction::Rotate;
     if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER)) return InputAction::Restart;
+    if (IsKeyPressed(KEY_SPACE)) return InputAction::HardDrop;
 
     return InputAction::None;
 }
 
+float mouseHeldTime;
 bool InputHandler::IsSoftDropHeld() const {
     // Teclado
     bool keyHeld = IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S);
@@ -84,7 +86,12 @@ bool InputHandler::IsSoftDropHeld() const {
     bool mouseHeld = false;
     if (mousePressed) {
         float deltaY = GetMousePosition().y - mousePressPos.y;
-        mouseHeld = (deltaY > SOFT_DROP_THRESHOLD);
+        mouseHeldTime += GetFrameTime();
+        mouseHeld = (mouseHeldTime > SOFT_DROP_HOLD_TIME);
+    }
+    else
+    {
+        mouseHeldTime = 0;
     }
 
     return keyHeld || mouseHeld;

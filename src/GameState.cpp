@@ -86,9 +86,27 @@ void GameState::HandleInput(InputAction action)
             
     }
     break;
+    case InputAction::HardDrop:
+    {
+        fallProgress = 0.5;
+        while (GameState::TryHardDrop())
+        {
+            
+        }
+        
+    }
+    break;
     default:
         break;
     }
+}
+
+bool GameState::TryHardDrop()
+{
+    currentPiece.Move(1, 0);
+    bool stopMove = !PieceFits(currentPiece) || IsPieceOutside(currentPiece);
+    if (stopMove) currentPiece.Move(-1, 0);
+    return !stopMove;
 }
 
 void GameState::Update(double deltaTime)
