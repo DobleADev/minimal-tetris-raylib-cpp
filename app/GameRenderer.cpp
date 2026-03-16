@@ -75,7 +75,7 @@ void GameRenderer::DrawGrid(const Grid &grid)
         for (int c = 0; c < grid.GetNumCols(); ++c)
         {
             int cellValue = grid.GetCell(r, c);
-            DrawRectangle(c * 30 + 241, r * 30 + 1, 29, 29, colors[cellValue]);
+            DrawRectangle(c * 30 - 150, r * 30 - 300, 29, 29, colors[cellValue]);
         }
     }
 }

@@ -13,6 +13,7 @@
 #include "Button.h"
 
 GameState* gameState;
+Camera2D* mainCamera;
 GameRenderer* renderer;
 InputHandler* input;
 AudioManager* audio;
@@ -25,6 +26,24 @@ Texture2D blockTexture;
 
 void UpdateFrame() {
     double deltaTime = GetFrameTime(); // en lugar de nuestro propio cálculo
+    float sw = (float)GetScreenWidth();
+    float sh = (float)GetScreenHeight();
+    bool isVertical = (sh > sw);
+
+    // El aspecto ratio real
+    float aspectRatio = sw / sh;
+    float worldWidth = 300.0f;  // 10 columnas * 30px
+    float worldHeight = 600.0f; // 20 filas * 30px
+
+    // Calculamos el zoom para que el tablero quepa perfectamente
+    float zoomX = sw / (worldWidth * 1.1f); // +100 para margen
+    float zoomY = sh / (worldHeight * 1.1f);
+
+    // Usamos el zoom más pequeño para asegurar que nada se corte
+    mainCamera->zoom = fminf(zoomX, zoomY);
+    mainCamera->offset = (Vector2){ sw / 2.0f, sh / 2.0f };
+    mainCamera->target = (Vector2){ 0, 0 }; // Asumiendo que el grid está centrado en 0,0
+
     if ((IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT))
     && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER))) 
     {
@@ -61,19 +80,21 @@ void UpdateFrame() {
 
     BeginDrawing();
     ClearBackground(darkBlue);
+    BeginMode2D(*mainCamera);
     renderer->DrawGrid(gameState->GetGrid());
     if (!gameState->IsGameOver())
     {
         // Draw current piece using pieceVisual
         Transform2D pieceTransform;
         pieceTransform.position = { 
-            241 + pieceVisual.visualCol * 30, 
-            1 + pieceVisual.visualRow * 30 
+            - 150 + pieceVisual.visualCol * 30, 
+            - 300 + pieceVisual.visualRow * 30 
         };
         pieceTransform.rotation = pieceVisual.visualRotation;
         pieceTransform.scale = {1, 1};
         renderer->DrawPiece(gameState->GetCurrentPiece(), pieceTransform, blockTexture);
     }
+    EndMode2D();
     
     renderer->DrawUI(*gameState);
     pauseButton->Draw();
@@ -98,6 +119,11 @@ int main() {
     SetExitKey(KEY_NULL); 
     InitAudioDevice();
     SetTargetFPS(60);
+    mainCamera = new Camera2D( { 0 } );
+    mainCamera->target = (Vector2){ 0.0f, 0.0f };
+    mainCamera->offset = (Vector2){ 0.0f, 0.0f };
+    mainCamera->rotation = 0.0f;
+    mainCamera->zoom = 1.0f;
     // SetGesturesEnabled(GESTURE_DRAG | GESTURE_SWIPE_DOWN | GESTURE_TAP | GESTURE_HOLD);
     Texture2D startButtonTex = LoadTexture("resources/sprites/start-btn.png");   // más directo que LoadTextureFromImage
     Texture2D pauseButtonTex = LoadTexture("resources/sprites/pause-btn.png");   // más directo que LoadTextureFromImage
@@ -170,6 +196,7 @@ int main() {
     delete audio;
     delete input;
     delete renderer;
+    delete mainCamera;
     delete gameState;
 
     CloseAudioDevice();

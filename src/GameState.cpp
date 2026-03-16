@@ -15,7 +15,7 @@ GameState::GameState()
       fallTimer(0),
       softDropMoves(0),
       nextBagIndex(0),
-      fallProgress(0.0),
+      fallProgress(0.0f),
       softDropHeld(false),
       visualRotation(0.0f),
       targetVisualRotation(0.0f)
@@ -37,7 +37,7 @@ void GameState::Reset()
     score = 0;
     softDropMoves = 0;
     fallTimer = 0;
-    fallProgress = 0.0;
+    fallProgress = 0.0f;
     softDropHeld = false;
     // Rebarajar bolsa
     static std::random_device rd;
@@ -195,10 +195,11 @@ void GameState::LockPiece()
     if (lines > 0 && onLinesCleared) onLinesCleared(lines);
     UpdateScore(lines, softDropMoves);
     softDropMoves = 0;
-
+    
     // Avanzar a la siguiente pieza
     currentPiece = nextPiece;
     nextPiece = GetNextPieceFromBag();
+    fallProgress = 0.0f;
 
     // Comprobar si la nueva pieza cabe; si no, game over
     if (!PieceFits(currentPiece) || IsPieceOutside(currentPiece))
