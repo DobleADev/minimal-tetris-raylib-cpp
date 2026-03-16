@@ -10,6 +10,7 @@ GameState::GameState()
     : grid(),
       piecesBag(GetAllTetrominos()),
       gameOver(true),
+      paused(false),
       score(0),
       fallTimer(0),
       softDropMoves(0),
@@ -32,6 +33,7 @@ void GameState::Reset()
 {
     grid.Initialize();
     gameOver = false;
+    paused = false;
     score = 0;
     softDropMoves = 0;
     fallTimer = 0;
@@ -50,10 +52,15 @@ void GameState::HandleInput(InputAction action)
 {
     if (gameOver)
     {
-        if (action == InputAction::Restart)
+        if (action == InputAction::Start)
         {
             Reset();
         }
+        return;
+    }
+
+    if (paused && action != InputAction::Pause)
+    {
         return;
     }
 
@@ -88,12 +95,19 @@ void GameState::HandleInput(InputAction action)
     break;
     case InputAction::HardDrop:
     {
+        int hardDropSuccesfullMoves = 0;
         fallProgress = 0.5;
         while (GameState::TryHardDrop())
         {
-            
+            hardDropSuccesfullMoves++;
         }
-        
+        UpdateScore(0, hardDropSuccesfullMoves);
+    }
+    break;
+
+    case InputAction::Pause:
+    {
+        TogglePause();
     }
     break;
     default:
@@ -111,7 +125,7 @@ bool GameState::TryHardDrop()
 
 void GameState::Update(double deltaTime)
 {
-    if (gameOver)
+    if (gameOver || paused)
         return;
     // Velocidad efectiva: si soft drop está activo, se acelera
     double effectiveInterval = softDropHeld ? fallInterval / 5.0 : fallInterval;
@@ -152,6 +166,12 @@ void GameState::Update(double deltaTime)
             visualRotation += (diff > 0 ? step : -step);
         }
     }
+}
+
+void GameState::TogglePause()
+{
+    if (gameOver) return;
+    paused = !paused;
 }
 
 void GameState::LockPiece()

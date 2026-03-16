@@ -17,6 +17,9 @@ GameRenderer* renderer;
 InputHandler* input;
 AudioManager* audio;
 Button* startButton = nullptr;
+Button* pauseButton = nullptr;
+Button* resumeButton = nullptr;
+Button* restartButton = nullptr;
 static PieceVisual pieceVisual;
 Texture2D blockTexture;
 
@@ -27,9 +30,19 @@ void UpdateFrame() {
     {
         startButton->Update(mouse);
     }
+    else if (gameState->IsPaused())
+    {
+        resumeButton->Update(mouse);
+        restartButton->Update(mouse);
+    }
+    else
+    {
+        pauseButton->Update(mouse);
+        input->Update();
+    }
     audio->UpdateMusic();
     // input->UpdateTouch();
-    input->Update();
+    
 
     InputAction action = input->GetAction();
     gameState->HandleInput(action);
@@ -38,17 +51,15 @@ void UpdateFrame() {
 
     gameState->Update(deltaTime);
 
-    if (!gameState->IsGameOver()) {
+    if (!gameState->IsGameOver() && !gameState->IsPaused()) {
         pieceVisual.Update(deltaTime, gameState->GetCurrentPiece(), gameState->GetFallProgress());
     }
 
     BeginDrawing();
     ClearBackground(darkBlue);
-    // renderer->Draw(*gameState, gameState->GetFallProgress());
     renderer->DrawGrid(gameState->GetGrid());
     if (!gameState->IsGameOver())
     {
-        // renderer->DrawPiece(gameState->GetCurrentPiece(), 241, -14, gameState->GetFallProgress());
         // Draw current piece using pieceVisual
         Transform2D pieceTransform;
         pieceTransform.position = { 
@@ -61,6 +72,14 @@ void UpdateFrame() {
     }
     
     renderer->DrawUI(*gameState);
+    pauseButton->Draw();
+    renderer->DrawPause(*gameState);
+    if (gameState->IsPaused())
+    {
+        resumeButton->Draw();
+        restartButton->Draw();
+    }
+    renderer->DrawMenu(*gameState);
     // Dibujar overlay de game over si es necesario
     if (gameState->IsGameOver())
     {
@@ -71,18 +90,38 @@ void UpdateFrame() {
 
 int main() {
     InitWindow(800, 600, "Minimal Tetris");
+    SetExitKey(KEY_NULL); 
     InitAudioDevice();
     SetTargetFPS(60);
     SetGesturesEnabled(GESTURE_DRAG | GESTURE_SWIPE_DOWN | GESTURE_TAP | GESTURE_HOLD);
-    Texture2D btnTex = LoadTexture("resources/start-btn.png");   // más directo que LoadTextureFromImage
-    Sound btnSound = LoadSound("resources/rotate-block.wav");
-    startButton = new Button(btnTex, { 400 - 100, 300 }, { 4, 4}, 3, btnSound);
+    Texture2D startButtonTex = LoadTexture("resources/sprites/start-btn.png");   // más directo que LoadTextureFromImage
+    Texture2D pauseButtonTex = LoadTexture("resources/sprites/pause-btn.png");   // más directo que LoadTextureFromImage
+    Texture2D resumeButtonTex = LoadTexture("resources/sprites/resume-btn.png");   // más directo que LoadTextureFromImage
+    Texture2D restartButtonTex = LoadTexture("resources/sprites/restart-btn.png");   // más directo que LoadTextureFromImage
+    Sound btnSound = LoadSound("resources/sounds/rotate-block.wav");
+    startButton = new Button(startButtonTex, { 400 - 100, 300 }, { 4, 4}, 3, btnSound);
     startButton->SetOnClick([]() {
-        gameState->HandleInput(InputAction::Restart);
+        gameState->HandleInput(InputAction::Start);
     });
-    blockTexture = LoadTextureFromImage(LoadImage("resources/block.png"));
+
+    pauseButton = new Button(pauseButtonTex, { 8, 8 }, { 4, 4}, 3, btnSound);
+    pauseButton->SetOnClick([]() {
+        gameState->HandleInput(InputAction::Pause);
+    });
+
+    resumeButton = new Button(resumeButtonTex, { 370 - 100, 300 }, { 4, 4}, 3, btnSound);
+    resumeButton->SetOnClick([]() {
+        gameState->HandleInput(InputAction::Pause);
+    });
+
+    restartButton = new Button(restartButtonTex, { 490 - 100, 300 }, { 4, 4}, 3, btnSound);
+    restartButton->SetOnClick([]() {
+        gameState->Reset();
+    });
+
+    blockTexture = LoadTextureFromImage(LoadImage("resources/sprites/block.png"));
     blockTexture.format = PIXELFORMAT_COMPRESSED_DXT1_RGB;
-    Font font = LoadFontEx("resources/PressStart2P-Regular.ttf", 24, 0, 0);
+    Font font = LoadFontEx("resources/fonts/PressStart2P-Regular.ttf", 24, 0, 0);
     // Si falla, usar fuente por defecto
     if (font.texture.id == 0) font = GetFontDefault();
 
@@ -99,6 +138,9 @@ int main() {
     }
 #endif
     delete startButton; 
+    delete pauseButton; 
+    delete resumeButton; 
+    delete restartButton; 
     delete audio;
     delete input;
     delete renderer;

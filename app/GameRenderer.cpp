@@ -5,6 +5,19 @@
 #include <cmath>
 #include "Transform2D.h"
 
+const char *startLabel = "Minimal Tetris";
+int startLabelSize = 36;
+float startLabelBlinkRate = 4;
+
+const char *pausedLabel = "Paused";
+int pausedLabelSize = 36;
+float pausedLabelBlinkRate = 4;
+
+double blockFallSpeedRate = 0.4;
+double blockFallSpeedMultiplier = 5;
+int screenWidth = 0;
+int screenHeight = 0;
+
 GameRenderer::GameRenderer(Font font) : font(font)
 {
     colors = GetCellColors(); // de colors.h
@@ -19,6 +32,40 @@ void GameRenderer::Draw(const GameState& state, double fallProgress)
     }
     
     DrawUI(state);
+}
+
+void GameRenderer::DrawPause(const GameState &state)
+{
+    screenWidth = GetScreenWidth();
+    screenHeight = GetScreenHeight();
+    // PAUSE MENU
+    if (state.IsPaused())
+    {
+        DrawRectangle(0, 0, screenWidth, screenHeight, Color({0, 0, 0, 127}));
+        int textWidth = MeasureText(pausedLabel, pausedLabelSize);
+        float t = GetTime() * pausedLabelBlinkRate;
+        int alpha = (int)abs(sin(t) * 255);
+        Color whiteBlink = {255, 255, 255, static_cast<unsigned char>(15 + alpha * 0.9)};
+        DrawTextEx(font, pausedLabel, {(float)((screenWidth / 2) - (textWidth)), (float)(screenHeight / 2) - 64}, pausedLabelSize, 2, whiteBlink);
+    }
+}
+
+void GameRenderer::DrawMenu(const GameState &state)
+{
+    screenWidth = GetScreenWidth();
+    screenHeight = GetScreenHeight();
+    // STARTUP
+    if (state.IsGameOver())
+    {
+        DrawRectangle(0, 0, screenWidth, screenHeight, Color({0, 0, 0, 127}));
+        int textWidth = MeasureText(startLabel, startLabelSize);
+        float t = GetTime() * startLabelBlinkRate;
+        int alpha = (int)abs(sin(t) * 255);
+        Color whiteBlink = {255, 255, 255, static_cast<unsigned char>(15 + alpha * 0.9)};
+        
+        DrawRectangleGradientV(0, 0, screenWidth, screenHeight, Color({64, 0, 255, 0}), Color({0, 127, 255, static_cast<unsigned char>(97 + alpha * 0.3)}));
+        DrawTextEx(font, startLabel, {(float)((screenWidth / 2) - (textWidth)), (float)(screenHeight / 2) - 64}, startLabelSize, 2, whiteBlink);
+    }
 }
 
 void GameRenderer::DrawGrid(const Grid &grid)
@@ -59,15 +106,6 @@ void GameRenderer::DrawPiece(const Tetromino& piece, const Transform2D& transfor
         DrawTextureEx(blockTex, worldPos, transform.rotation, 1.0f, colors[piece.GetId()]);
     }
 }
-
-const char *startLabel = "Minimal Tetris";
-int startLabelSize = 36;
-float startLabelBlinkRate = 4;
-
-double blockFallSpeedRate = 0.4;
-double blockFallSpeedMultiplier = 5;
-int screenWidth;
-int screenHeight;
 
 void GameRenderer::DrawUI(const GameState &state)
 {
@@ -121,17 +159,5 @@ void GameRenderer::DrawUI(const GameState &state)
     
     // NEXT BLOCK PIECE
     DrawPiece(state.GetNextPiece(), nextBlockRectangleXPosition - 55, 260, 0.0);
-
-    // STARTUP
-    if (state.IsGameOver())
-    {
-        DrawRectangle(0, 0, screenWidth, screenHeight, Color({0, 0, 0, 127}));
-        int textWidth = MeasureText(startLabel, startLabelSize);
-        float t = GetTime() * startLabelBlinkRate;
-        int alpha = (int)abs(sin(t) * 255);
-        Color whiteBlink = {255, 255, 255, static_cast<unsigned char>(15 + alpha * 0.9)};
-        
-        DrawRectangleGradientV(0, 0, screenWidth, screenHeight, Color({64, 0, 255, 0}), Color({0, 127, 255, static_cast<unsigned char>(97 + alpha * 0.3)}));
-        DrawTextEx(font, startLabel, {(float)((screenWidth / 2) - (textWidth)), (float)(screenHeight / 2) - 64}, startLabelSize, 2, whiteBlink);
-    }
 }
+

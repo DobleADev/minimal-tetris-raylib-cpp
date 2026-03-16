@@ -8,5 +8,6 @@ enum class InputAction {
     Rotate,
     SoftDrop,      // (usado como estado continuo, no como evento)
     HardDrop,      // <-- NUEVO: caída instantánea
-    Restart
+    Start,
+    Pause,
 };

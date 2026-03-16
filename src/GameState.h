@@ -13,6 +13,7 @@ public:
     bool TryHardDrop();
     void Update(double deltaTime); // Para caída automática
     bool IsGameOver() const { return gameOver; }
+    bool IsPaused() const { return paused; }
     int GetScore() const { return score; }
     const Grid& GetGrid() const { return grid; }
     const Tetromino& GetCurrentPiece() const { return currentPiece; }
@@ -20,6 +21,7 @@ public:
     void SetSoftDropHeld(bool held) { softDropHeld = held; }
     double GetFallProgress() const { return fallProgress; }
     float GetVisualRotation() const { return visualRotation; }
+    void TogglePause();
     // Para pruebas, podemos exponer más métodos si es necesario
 private:
     void SpawnNewPiece();
@@ -34,6 +36,7 @@ private:
     Tetromino currentPiece;
     Tetromino nextPiece;
     bool gameOver;
+    bool paused;
     int score;
     double fallTimer; // tiempo acumulado para la caída automática
     static const double fallInterval; // intervalo de caída normal

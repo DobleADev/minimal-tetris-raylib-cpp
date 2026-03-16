@@ -8,6 +8,8 @@ class GameRenderer {
 public:
     GameRenderer(Font font);
     void Draw(const GameState& state, double fallProgress); 
+    void DrawPause(const GameState& state); 
+    void DrawMenu(const GameState& state); 
     void DrawGrid(const Grid& grid);
     void DrawPiece(const Tetromino& piece, int offsetX, int offsetY, double fallProgress);
     void DrawPiece(const Tetromino& piece, const Transform2D& transform, Texture2D blockTex);

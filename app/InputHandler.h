@@ -22,12 +22,16 @@ private:
     Vector2 mousePressPos;       // Posición donde se presionó
     float dragAccumX;            // Acumulador de desplazamiento horizontal
     bool clickDetected;          // Se ha detectado un clic (para rotar)
+    bool swipeDownDetected; 
+    bool isHorizontalDrag;       // true si el arrastre es más horizontal que vertical
 
     // Umbrales
     static constexpr float DRAG_THRESHOLD = 30.0f;      // píxeles para mover una casilla
     static constexpr float CLICK_THRESHOLD = 10.0f;     // píxeles máximos para considerar clic
     static constexpr float SOFT_DROP_THRESHOLD = 30.0f;  // píxeles/frame para activar soft drop
     static constexpr float SOFT_DROP_HOLD_TIME = 0.5f;
+    static constexpr float SWIPE_THRESHOLD = 50.0f;
+    static constexpr float HORIZONTAL_RATIO = 2.0f;   // mínimo relación |dx|/|dy| para considera
 
     void ProcessMouse();
 };
