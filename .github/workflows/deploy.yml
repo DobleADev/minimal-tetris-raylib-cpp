@@ -136,8 +136,8 @@ jobs:
           APP_NAME="Minimal Tetris"
           PACKAGE_NAME="com.yourname.minimaltetris"
           # Replace placeholders in gradle.properties
-          sed -i "s/APP_NAME=.*/APP_NAME=$APP_NAME/" raymob/gradle.properties
-          sed -i "s/APPLICATION_ID=.*/APPLICATION_ID=$PACKAGE_NAME/" raymob/gradle.properties
+          sed -i "s/^app\.name=.*/app.name=$APP_NAME/" raymob/gradle.properties || echo "app.name=$APP_NAME" >> raymob/gradle.properties
+          sed -i "s/^app\.application_id=.*/app.application_id=$PACKAGE_NAME/" raymob/gradle.properties || echo "app.application_id=$PACKAGE_NAME" >> raymob/gradle.properties
           # Also update the app name in strings.xml (optional)
           sed -i "s/raymob/$APP_NAME/g" raymob/app/src/main/res/values/strings.xml
 
@@ -183,12 +183,13 @@ jobs:
 
           # Write to gradle.properties (create if missing)
           if [ -f gradle.properties ]; then
-            # Replace or add entries
-            sed -i "s/^VERSION_NAME=.*/VERSION_NAME=$VERSION_NAME/" gradle.properties || echo "VERSION_NAME=$VERSION_NAME" >> gradle.properties
-            sed -i "s/^VERSION_CODE=.*/VERSION_CODE=$VERSION_CODE/" gradle.properties || echo "VERSION_CODE=$VERSION_CODE" >> gradle.properties
+              # Replace or add app.version_name
+              sed -i "s/^app\.version_name=.*/app.version_name=$VERSION_NAME/" gradle.properties || echo "app.version_name=$VERSION_NAME" >> gradle.properties
+              # Replace or add app.version_code
+              sed -i "s/^app\.version_code=.*/app.version_code=$VERSION_CODE/" gradle.properties || echo "app.version_code=$VERSION_CODE" >> gradle.properties
           else
-            echo "VERSION_NAME=$VERSION_NAME" > gradle.properties
-            echo "VERSION_CODE=$VERSION_CODE" >> gradle.properties
+              echo "app.version_name=$VERSION_NAME" > gradle.properties
+              echo "app.version_code=$VERSION_CODE" >> gradle.properties
           fi
 
       # --- Build & Sign ---
