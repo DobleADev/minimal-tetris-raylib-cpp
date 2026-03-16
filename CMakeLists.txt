@@ -25,8 +25,7 @@ add_executable(${TARGET_NAME}
 app/main.cpp 
 app/GameRenderer.cpp 
 app/InputHandler.cpp 
-app/AudioManager.cpp 
-app/MobileInput.cpp  
+app/AudioManager.cpp
 app/Colors.cpp)
 target_link_libraries(${TARGET_NAME} PRIVATE tetris_core raylib)
 target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

@@ -25,6 +25,11 @@ Texture2D blockTexture;
 
 void UpdateFrame() {
     double deltaTime = GetFrameTime(); // en lugar de nuestro propio cálculo
+    if ((IsKeyDown(KEY_LEFT_ALT) || IsKeyDown(KEY_RIGHT_ALT))
+    && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_KP_ENTER))) 
+    {
+        ToggleFullscreen();
+    }
     Vector2 mouse = GetMousePosition();
     if (gameState->IsGameOver())
     {
@@ -41,7 +46,6 @@ void UpdateFrame() {
         input->Update();
     }
     audio->UpdateMusic();
-    // input->UpdateTouch();
     
 
     InputAction action = input->GetAction();
@@ -89,11 +93,12 @@ void UpdateFrame() {
 }
 
 int main() {
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_WINDOW_ALWAYS_RUN);
     InitWindow(800, 600, "Minimal Tetris");
     SetExitKey(KEY_NULL); 
     InitAudioDevice();
     SetTargetFPS(60);
-    SetGesturesEnabled(GESTURE_DRAG | GESTURE_SWIPE_DOWN | GESTURE_TAP | GESTURE_HOLD);
+    // SetGesturesEnabled(GESTURE_DRAG | GESTURE_SWIPE_DOWN | GESTURE_TAP | GESTURE_HOLD);
     Texture2D startButtonTex = LoadTexture("resources/sprites/start-btn.png");   // más directo que LoadTextureFromImage
     Texture2D pauseButtonTex = LoadTexture("resources/sprites/pause-btn.png");   // más directo que LoadTextureFromImage
     Texture2D resumeButtonTex = LoadTexture("resources/sprites/resume-btn.png");   // más directo que LoadTextureFromImage
@@ -125,10 +130,31 @@ int main() {
     // Si falla, usar fuente por defecto
     if (font.texture.id == 0) font = GetFontDefault();
 
-    gameState = new GameState();
     renderer = new GameRenderer(font);
     input = new InputHandler();
     audio = new AudioManager();
+
+    gameState = new GameState();
+
+    gameState->onRotate = []() {
+        audio->PlayRotateSound();
+    // PlaySound(lineClearSound);
+    // Podrías también llamar a un método del renderizador
+    // renderer->StartLineClearAnimation(lines);
+    };
+
+    gameState->onLinesCleared = [](int lines) {
+        audio->PlayClearSound();
+    // PlaySound(lineClearSound);
+    // Podrías también llamar a un método del renderizador
+    // renderer->StartLineClearAnimation(lines);
+    };
+    gameState->onGameOver = []() {
+        audio->PlayClearSound();
+        // PlaySound(gameOverSound);
+        // renderer->StartGameOverAnimation();
+    };
+    
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateFrame, 0, 1);

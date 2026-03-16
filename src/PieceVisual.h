@@ -15,9 +15,6 @@ struct PieceVisual {
 
         // Lerp smoothly (adjust speed as needed)
         float seconds = 0.02f; // units per second
-        // visualRow = Approach(visualRow, targetRow, deltaTime * lerpSpeed);
-        // visualRow = logicalPiece.GetRow();
-        // visualCol = logicalPiece.GetCol();
         visualRow = targetRow + fallProgress;
         visualCol = Lerp(visualCol, targetCol, deltaTime, seconds);
         visualRotation = LerpAngle(visualRotation, targetRot, deltaTime, seconds); // 300°/s
@@ -43,22 +40,4 @@ private:
         from += (to - from) * (1 - powf(0.5f, deltaTime / seconds));
         return from;
     }
-
-    // float Repeat(float t, float length) {
-    //     return t - std::floor(t / length) * length;
-    // }
-
-    // float LerpAngle(float a, float b, const float deltaTime, const float seconds) {
-    //     // 1. Calculate the raw difference
-    //     float t = (1 - powf(0.5f, deltaTime / seconds));
-    //     float delta = Repeat(b - a, t);
-        
-    //     // 2. Adjust to find the shortest path (-180 to 180)
-    //     if (delta > 180.0f) {
-    //         delta -= 360.0f;
-    //     }
-        
-    //     // 3. Perform the standard lerp on the adjusted delta
-    //     return a + delta * std::clamp(t, 0.0f, 1.0f);
-    // }
 };

@@ -89,6 +89,7 @@ void GameState::HandleInput(InputAction action)
         else 
         {
             targetVisualRotation += 90.0f;
+            if (onRotate) onRotate();
         }
             
     }
@@ -187,8 +188,11 @@ void GameState::LockPiece()
         if (!grid.IsCellOutside(r, c))
             grid.SetCell(r, c, currentPiece.GetId());
     }
+    totalPlacedPieces++;
 
     int lines = grid.ClearFullRows();
+    totalClearedLines += lines;
+    if (lines > 0 && onLinesCleared) onLinesCleared(lines);
     UpdateScore(lines, softDropMoves);
     softDropMoves = 0;
 
@@ -200,6 +204,11 @@ void GameState::LockPiece()
     if (!PieceFits(currentPiece) || IsPieceOutside(currentPiece))
     {
         gameOver = true;
+        if (onGameOver) 
+        {
+            onGameOver();
+        }
+        
     }
 }
 
